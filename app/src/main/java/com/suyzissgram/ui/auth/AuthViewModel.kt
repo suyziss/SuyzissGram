@@ -36,7 +36,7 @@ class AuthViewModel(
     }
 
     fun setEmail(value: String) = update { it.copy(email = value, error = null) }
-    fun setUsername(value: String) = update { it.copy(username = value, error = null) }
+    fun setUsername(value: String) = update { it.copy(username = value.removePrefix("@").take(14), error = null) }
     fun setPassword(value: String) = update { it.copy(password = value, error = null) }
 
     fun submit() {
