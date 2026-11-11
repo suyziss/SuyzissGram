@@ -15,7 +15,10 @@ class FakeProfileRepository(
     override fun observeProfile(): Flow<UserProfile> = profile.asStateFlow()
 
     override suspend fun updateProfile(profile: UserProfile) {
+        val current = this.profile.value
         val normalized = profile.copy(
+            id = current.id.ifBlank { profile.id },
+            email = current.email.ifBlank { profile.email },
             displayName = profile.displayName.trim().take(MAX_NAME_LENGTH),
             username = profile.username.trim().removePrefix("@")
                 .filter { it.isLetterOrDigit() || it == '_' }.take(MAX_USERNAME_LENGTH),
@@ -23,6 +26,8 @@ class FakeProfileRepository(
         )
         this.profile.value = normalized
         preferences.edit()
+            .putString(KEY_PROFILE_ID, normalized.id)
+            .putString(KEY_PROFILE_EMAIL, normalized.email)
             .putString(KEY_DISPLAY_NAME, normalized.displayName)
             .putString(KEY_USERNAME, normalized.username)
             .putString(KEY_BIO, normalized.bio)
@@ -31,6 +36,8 @@ class FakeProfileRepository(
     }
 
     private fun loadProfile(): UserProfile = UserProfile(
+        id = preferences.getString(KEY_PROFILE_ID, "").orEmpty(),
+        email = preferences.getString(KEY_PROFILE_EMAIL, "").orEmpty(),
         displayName = preferences.getString(KEY_DISPLAY_NAME, "").orEmpty(),
         username = preferences.getString(KEY_USERNAME, "").orEmpty(),
         bio = preferences.getString(KEY_BIO, "").orEmpty(),
@@ -38,6 +45,8 @@ class FakeProfileRepository(
     )
 
     private companion object {
+        const val KEY_PROFILE_ID = "profile_account_id"
+        const val KEY_PROFILE_EMAIL = "profile_email"
         const val KEY_DISPLAY_NAME = "profile_display_name"
         const val KEY_USERNAME = "profile_username"
         const val KEY_BIO = "profile_bio"
