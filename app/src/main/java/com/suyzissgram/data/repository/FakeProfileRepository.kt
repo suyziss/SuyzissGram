@@ -52,7 +52,7 @@ class FakeProfileRepository(
         const val KEY_BIO = "profile_bio"
         const val KEY_AVATAR_URI = "profile_avatar_uri"
         const val MAX_NAME_LENGTH = 64
-        const val MAX_USERNAME_LENGTH = 32
+        const val MAX_USERNAME_LENGTH = 14
         const val MAX_BIO_LENGTH = 120
     }
 }
