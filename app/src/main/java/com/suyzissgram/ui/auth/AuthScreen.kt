@@ -91,7 +91,7 @@ fun AuthScreen(
                 label = { Text("@Username") },
                 singleLine = true,
                 supportingText = {
-                    Text(if (isRussian) "4–32 символа: латиница, цифры и _" else "4–32 characters: letters, numbers and _")
+                    Text(if (isRussian) "4–14 символа: латиница, цифры и _" else "4–14 characters: letters, numbers and _")
                 }
             )
         }
