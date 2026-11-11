@@ -1,6 +1,7 @@
 package com.suyzissgram.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -11,7 +12,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.suyzissgram.di.AppContainer
-import com.suyzissgram.domain.model.AppLanguage
+import com.suyzissgram.domain.model.UserProfile
+import com.suyzissgram.ui.auth.AuthMode
+import com.suyzissgram.ui.auth.AuthScreen
+import com.suyzissgram.ui.auth.AuthViewModel
 import com.suyzissgram.ui.chat.ChatScreen
 import com.suyzissgram.ui.chat.ChatViewModel
 import com.suyzissgram.ui.chatlist.ChatListScreen
@@ -26,6 +30,7 @@ import com.suyzissgram.ui.theme.SuyzissTheme
 import kotlinx.coroutines.launch
 
 private object Routes {
+    const val AUTH = "auth"
     const val CHATS = "chats"
     const val CHAT = "chat/{chatId}"
     const val SETTINGS = "settings"
@@ -39,15 +44,53 @@ fun SuyzissNavHost(container: AppContainer) {
         factory = viewModelFactory { SettingsViewModel(container.settingsRepository) }
     )
     val settingsState by settingsViewModel.uiState.collectAsStateWithLifecycle()
+    val session by container.authRepository.observeSession()
+        .collectAsStateWithLifecycle(initialValue = container.authRepository.currentSession())
     val labels = AppStrings.forLanguage(settingsState.settings.language)
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
+    val startDestination = if (session == null) Routes.AUTH else Routes.CHATS
 
     SuyzissTheme(
         themeChoice = settingsState.settings.theme,
         textScale = settingsState.settings.textScale
     ) {
-        NavHost(navController = navController, startDestination = Routes.CHATS) {
+        NavHost(navController = navController, startDestination = startDestination) {
+            composable(Routes.AUTH) {
+                val viewModel: AuthViewModel = viewModel(
+                    factory = viewModelFactory { AuthViewModel(container.authRepository) }
+                )
+                val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+                LaunchedEffect(state.authenticatedUser) {
+                    val user = state.authenticatedUser ?: return@LaunchedEffect
+                    if (state.mode == AuthMode.REGISTER) {
+                        container.profileRepository.updateProfile(
+                            UserProfile(
+                                id = user.id,
+                                email = user.email,
+                                displayName = user.username,
+                                username = user.username
+                            )
+                        )
+                    }
+                    navController.navigate(Routes.CHATS) {
+                        popUpTo(Routes.AUTH) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+
+                AuthScreen(
+                    state = state,
+                    language = settingsState.settings.language,
+                    onModeChange = viewModel::setMode,
+                    onEmailChange = viewModel::setEmail,
+                    onUsernameChange = viewModel::setUsername,
+                    onPasswordChange = viewModel::setPassword,
+                    onSubmit = viewModel::submit
+                )
+            }
+
             composable(Routes.CHATS) {
                 val viewModel: ChatListViewModel = viewModel(
                     factory = viewModelFactory { ChatListViewModel(container.chatRepository) }
@@ -57,7 +100,8 @@ fun SuyzissNavHost(container: AppContainer) {
                     state = state,
                     labels = labels,
                     onOpenChat = { navController.navigate(Routes.chat("saved")) },
-                    onOpenSettings = { navController.navigate(Routes.SETTINGS) }
+                    onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                    onOpenProfile = { navController.navigate(Routes.PROFILE) }
                 )
             }
 
@@ -74,7 +118,8 @@ fun SuyzissNavHost(container: AppContainer) {
                     labels = labels,
                     onDraftChange = viewModel::onDraftChanged,
                     onSend = viewModel::sendMessage,
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+                    onOpenProfile = { navController.navigate(Routes.PROFILE) }
                 )
             }
 
