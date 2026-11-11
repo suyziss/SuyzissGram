@@ -4,6 +4,8 @@ import android.content.Context
 import com.suyzissgram.data.repository.FakeChatRepository
 import com.suyzissgram.data.repository.FakeProfileRepository
 import com.suyzissgram.data.repository.FakeSettingsRepository
+import com.suyzissgram.data.repository.LocalAuthRepository
+import com.suyzissgram.domain.repository.AuthRepository
 import com.suyzissgram.domain.repository.ChatRepository
 import com.suyzissgram.domain.repository.ProfileRepository
 import com.suyzissgram.domain.repository.SettingsRepository
@@ -14,6 +16,7 @@ class AppContainer(context: Context) {
         Context.MODE_PRIVATE
     )
 
+    val authRepository: AuthRepository = LocalAuthRepository(preferences)
     val chatRepository: ChatRepository = FakeChatRepository(preferences)
     val settingsRepository: SettingsRepository = FakeSettingsRepository(preferences)
     val profileRepository: ProfileRepository = FakeProfileRepository(preferences)
