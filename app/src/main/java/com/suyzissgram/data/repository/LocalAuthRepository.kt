@@ -33,19 +33,19 @@ class LocalAuthRepository(
         val normalizedUsername = username.trim().removePrefix("@")
 
         if (!EMAIL_PATTERN.matches(normalizedEmail)) {
-            password.fill('\\u0000')
+            password.fill('\u0000')
             return@withContext AuthResult.Error("Введите корректный email")
         }
         if (!USERNAME_PATTERN.matches(normalizedUsername)) {
-            password.fill('\\u0000')
+            password.fill('\u0000')
             return@withContext AuthResult.Error("Username должен содержать 4–14 символов: латинские буквы, цифры и _")
         }
         if (password.size < MIN_PASSWORD_LENGTH) {
-            password.fill('\\u0000')
+            password.fill('\u0000')
             return@withContext AuthResult.Error("Пароль должен содержать минимум 8 символов")
         }
         if (preferences.getString(KEY_ACCOUNT_ID, null) != null) {
-            password.fill('\\u0000')
+            password.fill('\u0000')
             return@withContext AuthResult.Error(
                 "На этом устройстве уже создан локальный аккаунт. Войдите в него."
             )
@@ -53,7 +53,7 @@ class LocalAuthRepository(
 
         val salt = ByteArray(SALT_LENGTH).also(SecureRandom()::nextBytes)
         val passwordHash = derivePasswordHash(password, salt)
-        password.fill('\\u0000')
+        password.fill('\u0000')
         val user = AuthUser(
             id = generateAccountId(),
             email = normalizedEmail,
@@ -87,12 +87,12 @@ class LocalAuthRepository(
         if (savedEmail == null || savedSalt == null || savedHash == null ||
             accountId == null || username == null
         ) {
-            password.fill('\\u0000')
+            password.fill('\u0000')
             return@withContext AuthResult.Error("Локальный аккаунт не найден")
         }
 
         val candidateHash = derivePasswordHash(password, savedSalt)
-        password.fill('\\u0000')
+        password.fill('\u0000')
         val passwordMatches = MessageDigest.isEqual(savedHash, candidateHash)
         candidateHash.fill(0)
 
