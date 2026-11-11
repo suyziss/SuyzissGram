@@ -12,7 +12,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -201,6 +203,7 @@ private fun SuyzissApp() {
                         Row(
                             Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                                 .clip(RoundedCornerShape(20.dp)).background(Panel)
+                                .clickable { inChat = true }
                                 .padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -231,13 +234,7 @@ private fun SuyzissApp() {
                                 Text("SuyzissGram Beta · Offline", color = Muted, fontSize = 12.sp)
                             }
                         }
-                        // The single Favorite conversation is the only chat in this offline beta.
-                        androidx.compose.foundation.clickable
-                    }
-                    // Keep the only conversation as a full-width, accessible tap target.
-                    Box(Modifier.fillMaxSize()) {
-                        androidx.compose.foundation.layout.Box(Modifier.fillMaxSize())
-                        androidx.compose.foundation.clickable
+
                     }
                 }
             }
