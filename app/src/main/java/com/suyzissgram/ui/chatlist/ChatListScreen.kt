@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
@@ -57,9 +56,6 @@ fun ChatListScreen(
                 )
                 Spacer(Modifier.size(5.dp))
                 Text(labels.chats, color = colors.onBackground, fontSize = 29.sp, fontWeight = FontWeight.Bold)
-            }
-            IconButton(onClick = onOpenProfile) {
-                Icon(Icons.Default.AccountCircle, contentDescription = "Profile", tint = colors.onBackground)
             }
             IconButton(onClick = onOpenProfile) {
                 Icon(Icons.Default.AccountCircle, contentDescription = "Profile", tint = colors.onBackground)
