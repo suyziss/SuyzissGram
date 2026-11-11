@@ -2,6 +2,7 @@ package com.suyzissgram.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -11,7 +12,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.suyzissgram.di.AppContainer
 import com.suyzissgram.domain.model.AppLanguage
-import com.suyzissgram.domain.model.ThemeChoice
 import com.suyzissgram.ui.chat.ChatScreen
 import com.suyzissgram.ui.chat.ChatViewModel
 import com.suyzissgram.ui.chatlist.ChatListScreen
@@ -21,6 +21,7 @@ import com.suyzissgram.ui.i18n.AppStrings
 import com.suyzissgram.ui.settings.SettingsScreen
 import com.suyzissgram.ui.settings.SettingsViewModel
 import com.suyzissgram.ui.theme.SuyzissTheme
+import kotlinx.coroutines.launch
 
 private object Routes {
     const val CHATS = "chats"
@@ -37,6 +38,7 @@ fun SuyzissNavHost(container: AppContainer) {
     val settingsState by settingsViewModel.uiState.collectAsStateWithLifecycle()
     val labels = AppStrings.forLanguage(settingsState.settings.language)
     val navController = rememberNavController()
+    val scope = rememberCoroutineScope()
 
     SuyzissTheme(
         themeChoice = settingsState.settings.theme,
@@ -82,17 +84,10 @@ fun SuyzissNavHost(container: AppContainer) {
                     onTheme = settingsViewModel::setTheme,
                     onTextScale = settingsViewModel::setTextScale,
                     onClearMessages = {
-                        settingsViewModel.viewModelScopeSafeClear(container)
+                        scope.launch { container.chatRepository.clearMessages() }
                     }
                 )
             }
         }
-    }
-}
-
-private fun SettingsViewModel.viewModelScopeSafeClear(container: AppContainer) {
-    // The repository owns local message storage; settings UI does not access it directly.
-    kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.Main) {
-        container.chatRepository.clearMessages()
     }
 }
