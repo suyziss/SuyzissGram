@@ -31,11 +31,16 @@ Available in the current prototype:
 
 - Local Favorites chat with on-device message persistence.
 - Settings screen with language selection: English, Russian, Japanese and Kazakh.
-- Initial appearance and text-size preference controls.
+- Functional dark, light and system theme selection.
+- App-wide text scaling preference.
 - Confirmation before clearing locally stored messages.
 - Back navigation between the main screen, chats and settings.
 
-Some settings are still being connected to the app's full visual system. The current version is an early prototype, not a finished messenger.
+The UI has been split into feature packages with ViewModels and repository interfaces. The current version remains an early local prototype, not a finished messenger.
+
+## Architecture
+
+The current package structure, dependency direction, DI decision and future Gradle module plan are documented in [Phase 0 — Step 1](docs/architecture/phase-0-step-1.md).
 
 ## Interface and feature roadmap
 
