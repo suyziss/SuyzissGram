@@ -1,10 +1,6 @@
 # SuyzissGram
 
 <p align="center">
-  <img src="assets/suyziss.png" alt="Suyziss character" width="220" />
-</p>
-
-<p align="center">
   <strong>Private space. Your messages. Your style.</strong><br />
   An offline-first Android messenger beta built with Kotlin and Jetpack Compose.
 </p>
