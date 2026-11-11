@@ -84,7 +84,7 @@ class LocalAuthRepository(
             savedEmail == null -> register(email, username, password)
             normalizedEmail == savedEmail -> login(email, password)
             else -> {
-                password.fill('\\u0000')
+                password.fill('\u0000')
                 AuthResult.Error(
                     "На этом устройстве уже есть локальный аккаунт с другим email. Войдите в него."
                 )
