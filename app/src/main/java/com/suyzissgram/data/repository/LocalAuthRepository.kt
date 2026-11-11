@@ -7,7 +7,6 @@ import com.suyzissgram.domain.repository.AuthRepository
 import com.suyzissgram.domain.repository.AuthResult
 import java.security.MessageDigest
 import java.security.SecureRandom
-import java.util.UUID
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 import kotlinx.coroutines.Dispatchers
@@ -34,19 +33,19 @@ class LocalAuthRepository(
         val normalizedUsername = username.trim().removePrefix("@")
 
         if (!EMAIL_PATTERN.matches(normalizedEmail)) {
-            password.fill('\u0000')
+            password.fill('\\u0000')
             return@withContext AuthResult.Error("Введите корректный email")
         }
         if (!USERNAME_PATTERN.matches(normalizedUsername)) {
-            password.fill('\u0000')
-            return@withContext AuthResult.Error("Username: 4–32 символа, латинские буквы, цифры и _")
+            password.fill('\\u0000')
+            return@withContext AuthResult.Error("Username должен содержать 4–14 символов: латинские буквы, цифры и _")
         }
         if (password.size < MIN_PASSWORD_LENGTH) {
-            password.fill('\u0000')
+            password.fill('\\u0000')
             return@withContext AuthResult.Error("Пароль должен содержать минимум 8 символов")
         }
         if (preferences.getString(KEY_ACCOUNT_ID, null) != null) {
-            password.fill('\u0000')
+            password.fill('\\u0000')
             return@withContext AuthResult.Error(
                 "На этом устройстве уже создан локальный аккаунт. Войдите в него."
             )
@@ -54,9 +53,9 @@ class LocalAuthRepository(
 
         val salt = ByteArray(SALT_LENGTH).also(SecureRandom()::nextBytes)
         val passwordHash = derivePasswordHash(password, salt)
-        password.fill('\u0000')
+        password.fill('\\u0000')
         val user = AuthUser(
-            id = UUID.randomUUID().toString(),
+            id = generateAccountId(),
             email = normalizedEmail,
             username = normalizedUsername
         )
@@ -88,12 +87,12 @@ class LocalAuthRepository(
         if (savedEmail == null || savedSalt == null || savedHash == null ||
             accountId == null || username == null
         ) {
-            password.fill('\u0000')
+            password.fill('\\u0000')
             return@withContext AuthResult.Error("Локальный аккаунт не найден")
         }
 
         val candidateHash = derivePasswordHash(password, savedSalt)
-        password.fill('\u0000')
+        password.fill('\\u0000')
         val passwordMatches = MessageDigest.isEqual(savedHash, candidateHash)
         candidateHash.fill(0)
 
@@ -105,6 +104,16 @@ class LocalAuthRepository(
         preferences.edit().putBoolean(KEY_SESSION_ACTIVE, true).apply()
         session.value = user
         AuthResult.Success(user)
+    }
+
+    private fun generateAccountId(): String {
+        val random = SecureRandom()
+        return buildString(ACCOUNT_ID_LENGTH) {
+            append(random.nextInt(9) + 1)
+            repeat(ACCOUNT_ID_LENGTH - 1) {
+                append(random.nextInt(10))
+            }
+        }
     }
 
     private fun loadSession(): AuthUser? {
@@ -133,8 +142,9 @@ class LocalAuthRepository(
 
     private companion object {
         val EMAIL_PATTERN = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
-        val USERNAME_PATTERN = Regex("^[A-Za-z][A-Za-z0-9_]{3,31}$")
+        val USERNAME_PATTERN = Regex("^[A-Za-z][A-Za-z0-9_]{3,13}$")
         const val MIN_PASSWORD_LENGTH = 8
+        const val ACCOUNT_ID_LENGTH = 10
         const val SALT_LENGTH = 16
         const val HASH_BITS = 256
         const val PBKDF2_ITERATIONS = 600_000
