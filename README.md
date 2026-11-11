@@ -21,7 +21,7 @@
 
 **SuyzissGram** is an independent Android messenger developed with Kotlin and Jetpack Compose. Its product goal is broad feature parity with modern messengers, including rich profiles, chats, media, privacy, groups, calls and detailed settings. It uses its own name, code, icons and visual identity. Telegram source code and proprietary assets are not copied.
 
-## Current release — 0.0.3 βeta
+## Current release — 0.8.001 βeta
 
 <p align="center"><strong>Early development · Local prototype · Android</strong></p>
 
@@ -29,7 +29,7 @@ Available in the current prototype:
 
 - Local Favorites chat with on-device message persistence.
 - Local registration and sign-in with email and password (no email verification code).
-- Generated permanent UUID account ID shown as read-only in the profile.
+- Generated permanent 10-digit numeric account ID shown as read-only in the profile.
 - Editable local profile: display name, username and bio.
 - Profile avatar selection through the Android system Photo Picker.
 - Profile data and selected avatar URI saved locally.
@@ -39,7 +39,7 @@ Available in the current prototype:
 - Confirmation before clearing locally stored messages.
 - Back navigation between the main screen, chats, settings and profile.
 
-The account is currently local to one app installation. Email and username uniqueness are not coordinated across devices, and the UUID is generated on-device; production-wide uniqueness must be enforced by the future server database. Email is not verified. Passwords are stored as salted PBKDF2-HMAC-SHA256 hashes, never as plaintext, but local credentials are not yet protected by an online authentication service or Android Keystore-backed encrypted storage. There is no password recovery flow.
+The account is currently local to one app installation. Email and username uniqueness are not coordinated across devices, and the numeric account ID is generated on-device; production-wide uniqueness must be enforced by the future server database. Email is not verified. Passwords are stored as salted PBKDF2-HMAC-SHA256 hashes, never as plaintext, but local credentials are not yet protected by an online authentication service or Android Keystore-backed encrypted storage. There is no password recovery flow.
 
 ## Architecture
 
@@ -106,7 +106,7 @@ app/build/outputs/apk/debug/app-debug.apk
 
 ## Project status
 
-- **Current version:** `0.0.3-beta`
+- **Current version:** `0.8.001-beta`
 - **Development status:** active testing
 - **Architecture:** native Android app, Kotlin + Jetpack Compose
 - **Current mode:** local-only prototype
