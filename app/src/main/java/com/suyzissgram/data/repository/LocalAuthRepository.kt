@@ -137,7 +137,7 @@ class LocalAuthRepository(
         const val MIN_PASSWORD_LENGTH = 8
         const val SALT_LENGTH = 16
         const val HASH_BITS = 256
-        const val PBKDF2_ITERATIONS = 120_000
+        const val PBKDF2_ITERATIONS = 600_000
 
         const val KEY_ACCOUNT_ID = "auth_account_id"
         const val KEY_EMAIL = "auth_email"
