@@ -18,6 +18,8 @@ import com.suyzissgram.ui.chatlist.ChatListScreen
 import com.suyzissgram.ui.chatlist.ChatListViewModel
 import com.suyzissgram.ui.common.viewModelFactory
 import com.suyzissgram.ui.i18n.AppStrings
+import com.suyzissgram.ui.profile.ProfileScreen
+import com.suyzissgram.ui.profile.ProfileViewModel
 import com.suyzissgram.ui.settings.SettingsScreen
 import com.suyzissgram.ui.settings.SettingsViewModel
 import com.suyzissgram.ui.theme.SuyzissTheme
@@ -27,6 +29,7 @@ private object Routes {
     const val CHATS = "chats"
     const val CHAT = "chat/{chatId}"
     const val SETTINGS = "settings"
+    const val PROFILE = "profile"
     fun chat(chatId: String) = "chat/$chatId"
 }
 
@@ -80,12 +83,30 @@ fun SuyzissNavHost(container: AppContainer) {
                     state = settingsState,
                     labels = labels,
                     onBack = { navController.popBackStack() },
+                    onOpenProfile = { navController.navigate(Routes.PROFILE) },
                     onLanguage = settingsViewModel::setLanguage,
                     onTheme = settingsViewModel::setTheme,
                     onTextScale = settingsViewModel::setTextScale,
                     onClearMessages = {
                         scope.launch { container.chatRepository.clearMessages() }
                     }
+                )
+            }
+
+            composable(Routes.PROFILE) {
+                val viewModel: ProfileViewModel = viewModel(
+                    factory = viewModelFactory { ProfileViewModel(container.profileRepository) }
+                )
+                val state by viewModel.uiState.collectAsStateWithLifecycle()
+                ProfileScreen(
+                    state = state,
+                    language = settingsState.settings.language,
+                    onBack = { navController.popBackStack() },
+                    onDisplayNameChange = viewModel::onDisplayNameChanged,
+                    onUsernameChange = viewModel::onUsernameChanged,
+                    onBioChange = viewModel::onBioChanged,
+                    onAvatarChange = viewModel::onAvatarChanged,
+                    onSave = viewModel::save
                 )
             }
         }
