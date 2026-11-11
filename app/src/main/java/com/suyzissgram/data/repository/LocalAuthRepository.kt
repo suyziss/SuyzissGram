@@ -73,6 +73,25 @@ class LocalAuthRepository(
         AuthResult.Success(user)
     }
 
+    override suspend fun authenticate(
+        email: String,
+        username: String,
+        password: CharArray
+    ): AuthResult {
+        val normalizedEmail = email.trim().lowercase()
+        val savedEmail = preferences.getString(KEY_EMAIL, null)
+        return when {
+            savedEmail == null -> register(email, username, password)
+            normalizedEmail == savedEmail -> login(email, password)
+            else -> {
+                password.fill('\\u0000')
+                AuthResult.Error(
+                    "На этом устройстве уже есть локальный аккаунт с другим email. Войдите в него."
+                )
+            }
+        }
+    }
+
     override suspend fun login(
         email: String,
         password: CharArray
