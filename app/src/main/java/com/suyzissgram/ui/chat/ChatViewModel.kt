@@ -2,7 +2,9 @@ package com.suyzissgram.ui.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.suyzissgram.domain.model.AttachmentKind
 import com.suyzissgram.domain.model.ChatMessage
+import com.suyzissgram.domain.model.MediaQuality
 import com.suyzissgram.domain.repository.ChatRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,6 +15,7 @@ data class ChatUiState(
     val messages: List<ChatMessage> = emptyList(),
     val draft: String = "",
     val isLoading: Boolean = true,
+    val isSendingAttachment: Boolean = false,
     val error: String? = null
 )
 
@@ -45,6 +48,37 @@ class ChatViewModel(
                 .onSuccess { _uiState.update { it.copy(draft = "") } }
                 .onFailure { error ->
                     _uiState.update { it.copy(error = error.message ?: "Unable to send message") }
+                }
+        }
+    }
+
+    fun sendAttachment(
+        sourceUri: String,
+        displayName: String,
+        mimeType: String?,
+        kind: AttachmentKind,
+        quality: MediaQuality
+    ) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSendingAttachment = true, error = null) }
+            runCatching {
+                repository.sendAttachment(sourceUri, displayName, mimeType, kind, quality)
+            }.onFailure { throwable ->
+                _uiState.update {
+                    it.copy(error = throwable.message ?: "Unable to save attachment")
+                }
+            }
+            _uiState.update { it.copy(isSendingAttachment = false) }
+        }
+    }
+
+    fun sendLocation(latitude: Double, longitude: Double) {
+        viewModelScope.launch {
+            runCatching { repository.sendLocation(latitude, longitude) }
+                .onFailure { throwable ->
+                    _uiState.update {
+                        it.copy(error = throwable.message ?: "Unable to attach location")
+                    }
                 }
         }
     }

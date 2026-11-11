@@ -12,8 +12,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.suyzissgram.di.AppContainer
-import com.suyzissgram.domain.model.UserProfile
-import com.suyzissgram.ui.auth.AuthMode
 import com.suyzissgram.ui.auth.AuthScreen
 import com.suyzissgram.ui.auth.AuthViewModel
 import com.suyzissgram.ui.chat.ChatScreen
@@ -117,6 +115,8 @@ fun SuyzissNavHost(container: AppContainer) {
                     labels = labels,
                     onDraftChange = viewModel::onDraftChanged,
                     onSend = viewModel::sendMessage,
+                    onSendAttachment = viewModel::sendAttachment,
+                    onSendLocation = viewModel::sendLocation,
                     onBack = { navController.popBackStack() },
                     onOpenProfile = { navController.navigate(Routes.PROFILE) }
                 )

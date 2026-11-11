@@ -11,7 +11,7 @@
   <img alt="Android" src="https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white" />
   <img alt="Kotlin" src="https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white" />
   <img alt="Jetpack Compose" src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4" />
-  <img alt="Version" src="https://img.shields.io/badge/Version-0.8.002%20βeta-8A63D2" />
+  <img alt="Version" src="https://img.shields.io/badge/Version-0.8.003%20βeta-8A63D2" />
   <img alt="Status" src="https://img.shields.io/badge/Status-Testing-orange" />
 </p>
 
@@ -21,7 +21,7 @@
 
 **SuyzissGram** is an independent Android messenger developed with Kotlin and Jetpack Compose. Its product goal is broad feature parity with modern messengers, including rich profiles, chats, media, privacy, groups, calls and detailed settings. It uses its own name, code, icons and visual identity. Telegram source code and proprietary assets are not copied.
 
-## Current release — 0.8.002 βeta
+## Current release — 0.8.003 βeta
 
 <p align="center"><strong>Early development · Local prototype · Android</strong></p>
 
@@ -38,6 +38,12 @@ Available in the current prototype:
 - App-wide text scaling preference.
 - Confirmation before clearing locally stored messages.
 - Back navigation between the main screen, chats, settings and profile.
+- Photo and video selection through Android Photo Picker, including multi-select.
+- Photo sending with a choice between locally compressed image copies and original files. Compression downsamples to a maximum 1920-pixel dimension and uses lossy WebP on Android 11+ or JPEG on older versions.
+- Video attachments are retained in their original quality in this release; video transcoding is not yet implemented.
+- File picker accepts any MIME type (`*/*`), and selected files are copied into app-private attachment storage so message attachments remain available after the picker grant expires.
+- Location sharing requests Android location permission and creates a local message with coordinates. Tapping it opens a compatible map app.
+- Attachments are stored only on this device and are not uploaded or delivered to another user.
 
 The prototype currently stores one local account per app installation. If a different email is entered while that local account exists, the app asks the user to sign in with the saved email. Email and username uniqueness are not coordinated across devices, and the numeric account ID is generated on-device; production-wide uniqueness must be enforced by the future server database. Email is not verified. Passwords are stored as salted PBKDF2-HMAC-SHA256 hashes, never as plaintext, but local credentials are not yet protected by an online authentication service or Android Keystore-backed encrypted storage. There is no password recovery flow.
 
@@ -62,11 +68,13 @@ The current package structure, dependency direction, DI decision and future Grad
 ### Messaging
 - [ ] Replies, forwarding, editing and deleting messages.
 - [ ] Reactions, message selection and context menus.
-- [ ] Photo, video, file and album sharing.
+- [x] Photo, video, file and album selection for local attachment messages.
 - [ ] Voice messages and media previews.
 
 ### Personalization
 - [ ] Accent colors, chat backgrounds and detailed text controls.
+- [ ] Demo Stars wallet, gift catalog and gift sending.
+- [ ] Profile themes and decorative profile elements.
 - [ ] Full profile privacy controls and complete multilingual resources.
 - [ ] Accessibility, tablet layouts and responsive navigation.
 
@@ -106,7 +114,7 @@ app/build/outputs/apk/debug/app-debug.apk
 
 ## Project status
 
-- **Current version:** `0.8.002-beta`
+- **Current version:** `0.8.003-beta`
 - **Development status:** active testing
 - **Architecture:** native Android app, Kotlin + Jetpack Compose
 - **Current mode:** local-only prototype

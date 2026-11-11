@@ -11,13 +11,14 @@ import com.suyzissgram.domain.repository.ProfileRepository
 import com.suyzissgram.domain.repository.SettingsRepository
 
 class AppContainer(context: Context) {
-    private val preferences = context.getSharedPreferences(
+    private val appContext = context.applicationContext
+    private val preferences = appContext.getSharedPreferences(
         PREFERENCES_NAME,
         Context.MODE_PRIVATE
     )
 
     val authRepository: AuthRepository = LocalAuthRepository(preferences)
-    val chatRepository: ChatRepository = FakeChatRepository(preferences)
+    val chatRepository: ChatRepository = FakeChatRepository(appContext, preferences)
     val settingsRepository: SettingsRepository = FakeSettingsRepository(preferences)
     val profileRepository: ProfileRepository = FakeProfileRepository(preferences)
 
