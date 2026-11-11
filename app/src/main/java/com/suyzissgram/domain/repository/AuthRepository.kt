@@ -12,5 +12,6 @@ interface AuthRepository {
     fun observeSession(): Flow<AuthUser?>
     fun currentSession(): AuthUser?
     suspend fun register(email: String, username: String, password: CharArray): AuthResult
+    suspend fun authenticate(email: String, username: String, password: CharArray): AuthResult
     suspend fun login(email: String, password: CharArray): AuthResult
 }
