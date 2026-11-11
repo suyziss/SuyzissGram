@@ -49,6 +49,10 @@ class ProfileViewModel(
         it.copy(avatarUri = uri)
     }
 
+    fun onAccentColorChanged(color: Long) = updateProfile {
+        it.copy(accentColor = color)
+    }
+
     fun save() = viewModelScope.launch {
         val current = _uiState.value.profile
         if (!USERNAME_PATTERN.matches(current.username)) {

@@ -22,7 +22,8 @@ class FakeProfileRepository(
             displayName = profile.displayName.trim().take(MAX_NAME_LENGTH),
             username = profile.username.trim().removePrefix("@")
                 .filter { it.isLetterOrDigit() || it == '_' }.take(MAX_USERNAME_LENGTH),
-            bio = profile.bio.trim().take(MAX_BIO_LENGTH)
+            bio = profile.bio.trim().take(MAX_BIO_LENGTH),
+            accentColor = profile.accentColor
         )
         this.profile.value = normalized
         preferences.edit()
@@ -32,6 +33,7 @@ class FakeProfileRepository(
             .putString(KEY_USERNAME, normalized.username)
             .putString(KEY_BIO, normalized.bio)
             .putString(KEY_AVATAR_URI, normalized.avatarUri)
+            .putLong(KEY_ACCENT_COLOR, normalized.accentColor)
             .apply()
     }
 
@@ -41,7 +43,8 @@ class FakeProfileRepository(
         displayName = preferences.getString(KEY_DISPLAY_NAME, "").orEmpty(),
         username = preferences.getString(KEY_USERNAME, "").orEmpty(),
         bio = preferences.getString(KEY_BIO, "").orEmpty(),
-        avatarUri = preferences.getString(KEY_AVATAR_URI, null)
+        avatarUri = preferences.getString(KEY_AVATAR_URI, null),
+        accentColor = preferences.getLong(KEY_ACCENT_COLOR, DEFAULT_ACCENT_COLOR)
     )
 
     private companion object {
@@ -51,8 +54,10 @@ class FakeProfileRepository(
         const val KEY_USERNAME = "profile_username"
         const val KEY_BIO = "profile_bio"
         const val KEY_AVATAR_URI = "profile_avatar_uri"
+        const val KEY_ACCENT_COLOR = "profile_accent_color"
         const val MAX_NAME_LENGTH = 64
         const val MAX_USERNAME_LENGTH = 14
         const val MAX_BIO_LENGTH = 120
+        const val DEFAULT_ACCENT_COLOR = 0xFF9B7BFFL
     }
 }

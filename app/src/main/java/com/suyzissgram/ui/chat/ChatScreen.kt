@@ -43,11 +43,14 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CardGiftcard
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
@@ -71,6 +74,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -91,6 +95,25 @@ import java.io.File
 import java.util.Locale
 import java.util.concurrent.Executor
 
+private data class ChatPalette(
+    val nameRu: String,
+    val nameEn: String,
+    val background: Color,
+    val surface: Color,
+    val bubble: Color,
+    val primary: Color,
+    val foreground: Color = Color.White,
+    val muted: Color = Color(0xFFC5C2CE)
+)
+
+private val chatPalettes = listOf(
+    ChatPalette("Фиолетовая", "Violet", Color(0xFF0E0D14), Color(0xFF191722), Color(0xFF4B337B), Color(0xFFB59AFF)),
+    ChatPalette("Океан", "Ocean", Color(0xFF071725), Color(0xFF102638), Color(0xFF155A82), Color(0xFF6CC8F5)),
+    ChatPalette("Изумруд", "Emerald", Color(0xFF081A15), Color(0xFF142921), Color(0xFF1C684C), Color(0xFF72D5A9)),
+    ChatPalette("Закат", "Sunset", Color(0xFF21120F), Color(0xFF30201B), Color(0xFF8A4234), Color(0xFFFFA27F)),
+    ChatPalette("Графит", "Graphite", Color(0xFF11151A), Color(0xFF20262D), Color(0xFF3D4A59), Color(0xFFB5C8DE))
+)
+
 private data class PendingMedia(
     val uri: Uri,
     val displayName: String,
@@ -106,13 +129,18 @@ fun ChatScreen(
     onSend: () -> Unit,
     onSendAttachment: (String, String, String?, AttachmentKind, MediaQuality) -> Unit,
     onSendLocation: (Double, Double) -> Unit,
+    chatTheme: Int,
+    onChatThemeChange: (Int) -> Unit,
+    onOpenGifts: () -> Unit,
     onBack: () -> Unit,
     onOpenProfile: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
     val isEnglish = labels.local == "Stored on this device"
+    val palette = chatPalettes.getOrElse(chatTheme) { chatPalettes.first() }
     val listState = rememberLazyListState()
+    var showPaletteDialog by remember { mutableStateOf(false) }
     var attachmentMenuExpanded by remember { mutableStateOf(false) }
     var pendingMedia by remember { mutableStateOf(emptyList<PendingMedia>()) }
     var showQualityDialog by remember { mutableStateOf(false) }
@@ -271,6 +299,46 @@ fun ChatScreen(
         if (uris.isNotEmpty()) sendPickedFiles(uris)
     }
 
+    if (showPaletteDialog) {
+        AlertDialog(
+            onDismissRequest = { showPaletteDialog = false },
+            title = { Text(if (isEnglish) "Chat appearance" else "Оформление чата") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    chatPalettes.forEachIndexed { index, option ->
+                        Row(
+                            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                                .clickable {
+                                    onChatThemeChange(index)
+                                    showPaletteDialog = false
+                                }
+                                .padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                Modifier.size(28.dp).clip(CircleShape)
+                                    .background(option.primary)
+                            )
+                            Spacer(Modifier.width(12.dp))
+                            Text(
+                                if (isEnglish) option.nameEn else option.nameRu,
+                                modifier = Modifier.weight(1f)
+                            )
+                            if (index == chatTheme) {
+                                Icon(Icons.Default.Check, contentDescription = null, tint = option.primary)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showPaletteDialog = false }) {
+                    Text(labels.cancel)
+                }
+            }
+        )
+    }
+
     if (showQualityDialog) {
         val hasPhotos = pendingMedia.any { it.kind == AttachmentKind.IMAGE }
         val hasVideos = pendingMedia.any { it.kind == AttachmentKind.VIDEO }
@@ -332,51 +400,58 @@ fun ChatScreen(
         }
     }
 
-    Column(Modifier.fillMaxSize().background(colors.background)) {
+    Column(Modifier.fillMaxSize().background(palette.background)) {
         Row(
-            Modifier.fillMaxWidth().background(colors.surface).padding(horizontal = 8.dp, vertical = 8.dp),
+            Modifier.fillMaxWidth().background(palette.surface).padding(horizontal = 8.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = labels.back, tint = colors.onSurface)
+                Icon(Icons.Default.ArrowBack, contentDescription = labels.back, tint = palette.foreground)
             }
             Box(
-                Modifier.size(40.dp).clip(CircleShape).background(colors.primary.copy(alpha = 0.2f))
+                Modifier.size(40.dp).clip(CircleShape).background(palette.primary.copy(alpha = 0.2f))
                     .clickable(onClick = onOpenProfile),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Star, contentDescription = null, tint = colors.primary)
+                Icon(Icons.Default.Star, contentDescription = null, tint = palette.primary)
             }
             Spacer(Modifier.width(11.dp))
             Column(Modifier.clickable(onClick = onOpenProfile)) {
-                Text(labels.favorite, color = colors.onSurface, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                Text(labels.local, color = colors.onSurfaceVariant, fontSize = 11.sp)
+                Text(labels.favorite, color = palette.foreground, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                Text(labels.local, color = palette.muted, fontSize = 11.sp)
+            }
+            Spacer(Modifier.weight(1f))
+            IconButton(onClick = onOpenGifts) {
+                Icon(Icons.Default.CardGiftcard, contentDescription = if (isEnglish) "Gifts" else "Подарки", tint = palette.foreground)
+            }
+            IconButton(onClick = { showPaletteDialog = true }) {
+                Icon(Icons.Default.Palette, contentDescription = if (isEnglish) "Chat appearance" else "Оформление чата", tint = palette.foreground)
             }
         }
 
         if (state.isLoading) {
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text("Loading…", color = colors.onSurfaceVariant)
+                Text("Loading…", color = palette.muted)
             }
         } else if (state.messages.isEmpty()) {
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
                         Modifier.size(66.dp).clip(CircleShape)
-                            .background(colors.primary.copy(alpha = 0.12f)),
+                            .background(palette.primary.copy(alpha = 0.16f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Default.Star,
                             contentDescription = null,
-                            tint = colors.primary,
+                            tint = palette.primary,
                             modifier = Modifier.size(30.dp)
                         )
                     }
                     Spacer(Modifier.size(14.dp))
-                    Text(labels.empty, color = colors.onSurface, fontWeight = FontWeight.SemiBold, fontSize = 17.sp)
+                    Text(labels.empty, color = palette.foreground, fontWeight = FontWeight.SemiBold, fontSize = 17.sp)
                     Spacer(Modifier.size(5.dp))
-                    Text(labels.emptyHint, color = colors.onSurfaceVariant, fontSize = 13.sp)
+                    Text(labels.emptyHint, color = palette.muted, fontSize = 13.sp)
                 }
             }
         } else {
@@ -389,6 +464,7 @@ fun ChatScreen(
                 items(state.messages, key = { it.id }) { message ->
                     MessageBubble(
                         message = message,
+                        palette = palette,
                         onOpenAttachment = { attachment ->
                             openAttachment(context, attachment)
                         }
@@ -398,7 +474,7 @@ fun ChatScreen(
         }
 
         Row(
-            Modifier.fillMaxWidth().background(colors.background).navigationBarsPadding()
+            Modifier.fillMaxWidth().background(palette.background).navigationBarsPadding()
                 .imePadding().padding(horizontal = 10.dp, vertical = 8.dp),
             verticalAlignment = Alignment.Bottom
         ) {
@@ -466,17 +542,21 @@ fun ChatScreen(
                 value = state.draft,
                 onValueChange = onDraftChange,
                 modifier = Modifier.weight(1f),
-                placeholder = { Text(labels.message, color = colors.onSurfaceVariant) },
+                placeholder = { Text(labels.message, color = palette.muted) },
                 shape = RoundedCornerShape(24.dp),
                 maxLines = 5,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                 keyboardActions = KeyboardActions(onSend = { onSend() }),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colors.primary,
-                    unfocusedBorderColor = colors.surface,
-                    focusedContainerColor = colors.surface,
-                    unfocusedContainerColor = colors.surface,
-                    cursorColor = colors.primary
+                    focusedBorderColor = palette.primary,
+                    unfocusedBorderColor = palette.surface,
+                    focusedContainerColor = palette.surface,
+                    unfocusedContainerColor = palette.surface,
+                    focusedTextColor = palette.foreground,
+                    unfocusedTextColor = palette.foreground,
+                    focusedPlaceholderColor = palette.muted,
+                    unfocusedPlaceholderColor = palette.muted,
+                    cursorColor = palette.primary
                 )
             )
             Spacer(Modifier.width(8.dp))
@@ -492,7 +572,7 @@ fun ChatScreen(
         if (state.isSendingAttachment) {
             Text(
                 if (isEnglish) "Saving attachment…" else "Сохранение вложения…",
-                color = colors.onSurfaceVariant,
+                color = palette.muted,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                 fontSize = 12.sp
             )
@@ -509,6 +589,7 @@ fun ChatScreen(
 @Composable
 private fun MessageBubble(
     message: ChatMessage,
+    palette: ChatPalette,
     onOpenAttachment: (ChatAttachment) -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
@@ -527,19 +608,19 @@ private fun MessageBubble(
                         bottomEnd = if (message.outgoing) 5.dp else 18.dp
                     )
                 )
-                .background(if (message.outgoing) colors.primary.copy(alpha = 0.22f) else colors.surface)
+                .background(if (message.outgoing) palette.bubble else palette.surface)
                 .padding(horizontal = 13.dp, vertical = 9.dp)
         ) {
             if (attachment != null) {
-                AttachmentContent(attachment, onOpenAttachment)
+                AttachmentContent(attachment, palette, onOpenAttachment)
             }
             if (message.text.isNotBlank() && (attachment == null || attachment.kind == AttachmentKind.LOCATION)) {
-                Text(message.text, color = colors.onSurface, fontSize = 15.sp)
+                Text(message.text, color = palette.foreground, fontSize = 15.sp)
             }
             Spacer(Modifier.size(4.dp))
             Text(
                 message.time,
-                color = colors.onSurfaceVariant,
+                color = palette.muted,
                 fontSize = 10.sp,
                 modifier = Modifier.align(Alignment.End)
             )
@@ -550,9 +631,9 @@ private fun MessageBubble(
 @Composable
 private fun AttachmentContent(
     attachment: ChatAttachment,
+    palette: ChatPalette,
     onOpenAttachment: (ChatAttachment) -> Unit
 ) {
-    val colors = MaterialTheme.colorScheme
     when (attachment.kind) {
         AttachmentKind.IMAGE -> {
             val bitmap by produceState<Bitmap?>(initialValue = null, attachment.localPath) {
@@ -574,27 +655,27 @@ private fun AttachmentContent(
                     contentScale = ContentScale.Crop
                 )
             } else {
-                AttachmentFileCard(attachment, onOpenAttachment)
+                AttachmentFileCard(attachment, palette, onOpenAttachment)
             }
             Text(
                 if (attachment.quality == MediaQuality.COMPRESSED) "Compressed photo" else "Original photo",
-                color = colors.onSurfaceVariant,
+                color = palette.muted,
                 fontSize = 11.sp
             )
         }
-        AttachmentKind.VIDEO, AttachmentKind.FILE -> AttachmentFileCard(attachment, onOpenAttachment)
+        AttachmentKind.VIDEO, AttachmentKind.FILE -> AttachmentFileCard(attachment, palette, onOpenAttachment)
         AttachmentKind.LOCATION -> {
             Row(
                 Modifier.fillMaxWidth().clickable { onOpenAttachment(attachment) }.padding(vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Default.LocationOn, contentDescription = null, tint = colors.primary, modifier = Modifier.size(30.dp))
+                Icon(Icons.Default.LocationOn, contentDescription = null, tint = palette.primary, modifier = Modifier.size(30.dp))
                 Spacer(Modifier.width(10.dp))
                 Column {
-                    Text("Location", color = colors.onSurface, fontWeight = FontWeight.SemiBold)
+                    Text("Location", color = palette.foreground, fontWeight = FontWeight.SemiBold)
                     Text(
                         "${attachment.latitude ?: 0.0}, ${attachment.longitude ?: 0.0}",
-                        color = colors.onSurfaceVariant,
+                        color = palette.muted,
                         fontSize = 11.sp
                     )
                 }
@@ -606,9 +687,9 @@ private fun AttachmentContent(
 @Composable
 private fun AttachmentFileCard(
     attachment: ChatAttachment,
+    palette: ChatPalette,
     onOpenAttachment: (ChatAttachment) -> Unit
 ) {
-    val colors = MaterialTheme.colorScheme
     Row(
         Modifier.fillMaxWidth().clickable { onOpenAttachment(attachment) }.padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -616,20 +697,20 @@ private fun AttachmentFileCard(
         Icon(
             imageVector = if (attachment.kind == AttachmentKind.VIDEO) Icons.Default.Movie else Icons.Default.AttachFile,
             contentDescription = null,
-            tint = colors.primary,
+            tint = palette.primary,
             modifier = Modifier.size(34.dp)
         )
         Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f)) {
             Text(
                 attachment.displayName.ifBlank { "Attachment" },
-                color = colors.onSurface,
+                color = palette.foreground,
                 fontWeight = FontWeight.Medium,
                 maxLines = 2
             )
             Text(
                 formatFileSize(attachment.sizeBytes),
-                color = colors.onSurfaceVariant,
+                color = palette.muted,
                 fontSize = 11.sp
             )
         }

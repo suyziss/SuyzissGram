@@ -20,6 +20,8 @@ import com.suyzissgram.ui.chatlist.ChatListScreen
 import com.suyzissgram.ui.chatlist.ChatListViewModel
 import com.suyzissgram.ui.common.viewModelFactory
 import com.suyzissgram.ui.i18n.AppStrings
+import com.suyzissgram.ui.gifts.GiftViewModel
+import com.suyzissgram.ui.gifts.GiftsScreen
 import com.suyzissgram.ui.profile.ProfileScreen
 import com.suyzissgram.ui.profile.ProfileViewModel
 import com.suyzissgram.ui.settings.SettingsScreen
@@ -34,6 +36,7 @@ private object Routes {
     const val CHAT = "chat/{chatId}"
     const val SETTINGS = "settings"
     const val PROFILE = "profile"
+    const val GIFTS = "gifts"
     fun chat(chatId: String) = "chat/$chatId"
 }
 
@@ -117,8 +120,25 @@ fun SuyzissNavHost(container: AppContainer) {
                     onSend = viewModel::sendMessage,
                     onSendAttachment = viewModel::sendAttachment,
                     onSendLocation = viewModel::sendLocation,
+                    chatTheme = settingsState.settings.chatTheme,
+                    onChatThemeChange = settingsViewModel::setChatTheme,
+                    onOpenGifts = { navController.navigate(Routes.GIFTS) },
                     onBack = { navController.popBackStack() },
                     onOpenProfile = { navController.navigate(Routes.PROFILE) }
+                )
+            }
+
+            composable(Routes.GIFTS) {
+                val giftViewModel: GiftViewModel = viewModel(
+                    factory = viewModelFactory { GiftViewModel(container.giftRepository) }
+                )
+                val giftState by giftViewModel.uiState.collectAsStateWithLifecycle()
+                GiftsScreen(
+                    state = giftState,
+                    language = settingsState.settings.language,
+                    onBack = { navController.popBackStack() },
+                    onSendGift = giftViewModel::sendGift,
+                    onClearError = giftViewModel::clearError
                 )
             }
 
@@ -150,6 +170,7 @@ fun SuyzissNavHost(container: AppContainer) {
                     onUsernameChange = viewModel::onUsernameChanged,
                     onBioChange = viewModel::onBioChanged,
                     onAvatarChange = viewModel::onAvatarChanged,
+                    onAccentColorChange = viewModel::onAccentColorChanged,
                     onSave = viewModel::save
                 )
             }

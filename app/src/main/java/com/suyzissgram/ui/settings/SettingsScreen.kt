@@ -184,7 +184,7 @@ fun SettingsScreen(
                         .background(colors.surface).padding(16.dp)
                 ) {
                     Text(labels.version, color = colors.onSurface)
-                    Text("0.8.003 βeta · ${labels.testing}", color = colors.onSurfaceVariant, fontSize = 13.sp)
+                    Text("0.8.004 βeta · ${labels.testing}", color = colors.onSurfaceVariant, fontSize = 13.sp)
                 }
             }
         }

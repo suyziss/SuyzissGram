@@ -42,6 +42,10 @@ class SettingsViewModel(
         repository.setTextScale(value)
     }
 
+    fun setChatTheme(value: Int) = viewModelScope.launch {
+        repository.setChatTheme(value)
+    }
+
     fun clearMessages(onComplete: () -> Unit) = viewModelScope.launch {
         onComplete()
     }

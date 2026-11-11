@@ -6,5 +6,6 @@ data class UserProfile(
     val displayName: String = "",
     val username: String = "",
     val bio: String = "",
-    val avatarUri: String? = null
+    val avatarUri: String? = null,
+    val accentColor: Long = 0xFF9B7BFFL
 )

@@ -10,4 +10,5 @@ interface SettingsRepository {
     suspend fun setLanguage(language: AppLanguage)
     suspend fun setTheme(theme: ThemeChoice)
     suspend fun setTextScale(scale: Float)
+    suspend fun setChatTheme(theme: Int)
 }

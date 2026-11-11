@@ -11,5 +11,6 @@ enum class ThemeChoice {
 data class AppSettings(
     val language: AppLanguage = AppLanguage.RU,
     val theme: ThemeChoice = ThemeChoice.DARK,
-    val textScale: Float = 1f
+    val textScale: Float = 1f,
+    val chatTheme: Int = 0
 )

@@ -12,8 +12,8 @@ android {
         applicationId = "com.suyzissgram"
         minSdk = 26
         targetSdk = 35
-        versionCode = 8003
-        versionName = "0.8.003-beta"
+        versionCode = 8004
+        versionName = "0.8.004-beta"
     }
 
     compileOptions {

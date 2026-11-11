@@ -28,12 +28,17 @@ class FakeSettingsRepository(
         update(settings.value.copy(textScale = scale.coerceIn(0.85f, 1.25f)))
     }
 
+    override suspend fun setChatTheme(theme: Int) {
+        update(settings.value.copy(chatTheme = theme.coerceIn(0, MAX_CHAT_THEME)))
+    }
+
     private fun update(value: AppSettings) {
         settings.value = value
         preferences.edit()
             .putString(KEY_LANGUAGE, value.language.name)
             .putString(KEY_THEME, value.theme.name)
             .putFloat(KEY_TEXT_SCALE, value.textScale)
+            .putInt(KEY_CHAT_THEME, value.chatTheme)
             .apply()
     }
 
@@ -48,7 +53,8 @@ class FakeSettingsRepository(
         return AppSettings(
             language = language,
             theme = theme,
-            textScale = preferences.getFloat(KEY_TEXT_SCALE, 1f).coerceIn(0.85f, 1.25f)
+            textScale = preferences.getFloat(KEY_TEXT_SCALE, 1f).coerceIn(0.85f, 1.25f),
+            chatTheme = preferences.getInt(KEY_CHAT_THEME, 0).coerceIn(0, MAX_CHAT_THEME)
         )
     }
 
@@ -56,5 +62,7 @@ class FakeSettingsRepository(
         const val KEY_LANGUAGE = "language"
         const val KEY_THEME = "theme"
         const val KEY_TEXT_SCALE = "text_scale"
+        const val KEY_CHAT_THEME = "chat_theme"
+        const val MAX_CHAT_THEME = 4
     }
 }

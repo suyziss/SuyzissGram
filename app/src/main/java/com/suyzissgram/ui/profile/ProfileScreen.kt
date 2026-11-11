@@ -6,6 +6,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +38,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -47,6 +50,15 @@ import com.suyzissgram.domain.model.AppLanguage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+private val profileAccentColors = listOf(
+    0xFF9B7BFFL,
+    0xFF58A6FFL,
+    0xFF47B881L,
+    0xFFFF8A65L,
+    0xFFE56BA8L,
+    0xFFFFC15BL
+)
+
 @Composable
 fun ProfileScreen(
     state: ProfileUiState,
@@ -56,6 +68,7 @@ fun ProfileScreen(
     onUsernameChange: (String) -> Unit,
     onBioChange: (String) -> Unit,
     onAvatarChange: (String?) -> Unit,
+    onAccentColorChange: (Long) -> Unit,
     onSave: () -> Unit
 ) {
     val isRussian = language == AppLanguage.RU
@@ -116,7 +129,7 @@ fun ProfileScreen(
         ) {
             Box(
                 modifier = Modifier.size(112.dp).clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                    .background(Color(state.profile.accentColor.toInt()).copy(alpha = 0.20f)),
                 contentAlignment = Alignment.Center
             ) {
                 if (avatarBitmap != null) {
@@ -130,7 +143,7 @@ fun ProfileScreen(
                     Icon(
                         Icons.Default.Person,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                        tint = Color(state.profile.accentColor.toInt()),
                         modifier = Modifier.size(52.dp)
                     )
                 }
@@ -146,6 +159,34 @@ fun ProfileScreen(
                 if (state.profile.avatarUri != null) {
                     TextButton(onClick = { onAvatarChange(null) }) {
                         Text(if (isRussian) "Удалить" else "Remove")
+                    }
+                }
+            }
+
+            Column(Modifier.fillMaxWidth()) {
+                Text(
+                    if (isRussian) "Цвет профиля" else "Profile accent",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    profileAccentColors.forEach { accent ->
+                        Box(
+                            modifier = Modifier.size(30.dp).clip(CircleShape)
+                                .background(Color(accent.toInt()))
+                                .clickable { onAccentColorChange(accent) }
+                                .then(
+                                    if (state.profile.accentColor == accent) {
+                                        Modifier.border(2.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
+                                    } else {
+                                        Modifier
+                                    }
+                                )
+                        )
                     }
                 }
             }
