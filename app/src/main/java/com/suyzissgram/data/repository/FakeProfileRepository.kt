@@ -17,8 +17,8 @@ class FakeProfileRepository(
     override suspend fun updateProfile(profile: UserProfile) {
         val current = this.profile.value
         val normalized = profile.copy(
-            id = current.id.ifBlank { profile.id },
-            email = current.email.ifBlank { profile.email },
+            id = profile.id.ifBlank { current.id },
+            email = profile.email.ifBlank { current.email },
             displayName = profile.displayName.trim().take(MAX_NAME_LENGTH),
             username = profile.username.trim().removePrefix("@")
                 .filter { it.isLetterOrDigit() || it == '_' }.take(MAX_USERNAME_LENGTH),
