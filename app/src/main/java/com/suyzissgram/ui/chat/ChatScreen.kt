@@ -1,6 +1,7 @@
 package com.suyzissgram.ui.chat
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,7 +51,8 @@ fun ChatScreen(
     labels: AppStrings,
     onDraftChange: (String) -> Unit,
     onSend: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenProfile: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val listState = rememberLazyListState()
@@ -68,13 +70,14 @@ fun ChatScreen(
                 Icon(Icons.Default.ArrowBack, contentDescription = labels.back, tint = colors.onSurface)
             }
             Box(
-                Modifier.size(40.dp).clip(CircleShape).background(colors.primary.copy(alpha = 0.2f)),
+                Modifier.size(40.dp).clip(CircleShape).background(colors.primary.copy(alpha = 0.2f))
+                    .clickable(onClick = onOpenProfile),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(Icons.Default.Star, contentDescription = null, tint = colors.primary)
             }
             Spacer(Modifier.width(11.dp))
-            Column {
+            Column(Modifier.clickable(onClick = onOpenProfile)) {
                 Text(labels.favorite, color = colors.onSurface, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                 Text(labels.local, color = colors.onSurfaceVariant, fontSize = 11.sp)
             }
