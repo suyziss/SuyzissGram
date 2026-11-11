@@ -7,6 +7,7 @@ import com.suyzissgram.domain.repository.ChatRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -20,18 +21,17 @@ class FakeChatRepository(
 
     override fun observeMessages(): Flow<List<ChatMessage>> = messages.asStateFlow()
 
-    override fun observeChats(): Flow<List<ChatPreview>> =
-        kotlinx.coroutines.flow.map(messages) { items ->
-            listOf(
-                ChatPreview(
-                    id = SAVED_CHAT_ID,
-                    title = "Favorite",
-                    subtitle = "Your personal space",
-                    lastMessage = items.lastOrNull()?.text ?: "Your personal space",
-                    lastMessageTime = items.lastOrNull()?.time.orEmpty()
-                )
+    override fun observeChats(): Flow<List<ChatPreview>> = messages.map { items ->
+        listOf(
+            ChatPreview(
+                id = SAVED_CHAT_ID,
+                title = "Favorite",
+                subtitle = "Your personal space",
+                lastMessage = items.lastOrNull()?.text ?: "Your personal space",
+                lastMessageTime = items.lastOrNull()?.time.orEmpty()
             )
-        }
+        )
+    }
 
     override suspend fun sendMessage(text: String) {
         val normalized = text.trim()
