@@ -38,7 +38,7 @@ class ProfileViewModel(
     }
 
     fun onUsernameChanged(value: String) = updateProfile {
-        it.copy(username = value)
+        it.copy(username = value.removePrefix("@").take(14))
     }
 
     fun onBioChanged(value: String) = updateProfile {
