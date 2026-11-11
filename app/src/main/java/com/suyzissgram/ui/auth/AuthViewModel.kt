@@ -45,17 +45,11 @@ class AuthViewModel(
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
-            val result = when (state.mode) {
-                AuthMode.REGISTER -> repository.register(
-                    state.email,
-                    state.username,
-                    state.password.toCharArray()
-                )
-                AuthMode.LOGIN -> repository.login(
-                    state.email,
-                    state.password.toCharArray()
-                )
-            }
+            val result = repository.authenticate(
+                state.email,
+                state.username,
+                state.password.toCharArray()
+            )
 
             when (result) {
                 is AuthResult.Success -> _uiState.update {
