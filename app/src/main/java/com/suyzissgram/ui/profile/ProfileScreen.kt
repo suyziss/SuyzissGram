@@ -164,6 +164,20 @@ fun ProfileScreen(
                 }
             }
 
+            if (state.profile.id.isNotBlank()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(14.dp))
+                        .padding(14.dp)
+                ) {
+                    Text(if (isRussian) "Постоянный ID" else "Permanent ID", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                    Text(state.profile.id, color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
+                    Spacer(Modifier.size(10.dp))
+                    Text(if (isRussian) "Электронная почта" else "Email", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                    Text(state.profile.email, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
+                }
+            }
+
             OutlinedTextField(
                 value = state.profile.displayName,
                 onValueChange = onDisplayNameChange,
