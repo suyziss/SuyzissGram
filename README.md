@@ -28,6 +28,8 @@
 Available in the current prototype:
 
 - Local Favorites chat with on-device message persistence.
+- Local registration and sign-in with email and password (no email verification code).
+- Generated permanent UUID account ID shown as read-only in the profile.
 - Editable local profile: display name, username and bio.
 - Profile avatar selection through the Android system Photo Picker.
 - Profile data and selected avatar URI saved locally.
@@ -37,7 +39,7 @@ Available in the current prototype:
 - Confirmation before clearing locally stored messages.
 - Back navigation between the main screen, chats, settings and profile.
 
-The profile is a local device profile, not a verified online account. No phone-number verification, server-side username availability check or cloud profile sync exists yet.
+The account is currently local to one app installation. Email and username uniqueness are not coordinated across devices, and the UUID is generated on-device; production-wide uniqueness must be enforced by the future server database. Email is not verified. Passwords are stored as salted PBKDF2-HMAC-SHA256 hashes, never as plaintext, but local credentials are not yet protected by an online authentication service or Android Keystore-backed encrypted storage. There is no password recovery flow.
 
 ## Architecture
 
@@ -49,7 +51,8 @@ The current package structure, dependency direction, DI decision and future Grad
 - [x] Local profile editor for display name, username and bio.
 - [x] Local avatar selection.
 - [ ] Phone number, birthday, privacy visibility and QR profile.
-- [ ] Account registration, verification and cloud profile sync.
+- [x] Local email/password registration and sign-in without email-code verification.
+- [ ] Server-side account creation, globally unique ID allocation, password recovery and cloud profile sync.
 
 ### Chats and navigation
 - [ ] Conversation list with per-chat avatars, previews and timestamps.
