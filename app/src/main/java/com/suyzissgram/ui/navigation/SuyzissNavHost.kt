@@ -83,7 +83,6 @@ fun SuyzissNavHost(container: AppContainer) {
                 AuthScreen(
                     state = state,
                     language = settingsState.settings.language,
-                    onModeChange = viewModel::setMode,
                     onEmailChange = viewModel::setEmail,
                     onUsernameChange = viewModel::setUsername,
                     onPasswordChange = viewModel::setPassword,
