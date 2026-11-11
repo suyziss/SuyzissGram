@@ -180,7 +180,7 @@ fun ProfileScreen(
                 prefix = { Text("@") },
                 singleLine = true,
                 supportingText = {
-                    Text(if (isRussian) "Латинские буквы, цифры и _" else "Letters, numbers and _")
+                    Text(if (isRussian) "4–14 символов: латинские буквы, цифры и _" else "4–14 characters: letters, numbers and _")
                 }
             )
             OutlinedTextField(
