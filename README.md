@@ -1,62 +1,115 @@
 # SuyzissGram
 
-<p align="center"><strong>A Telegram-inspired Android messenger experience</strong><br />Kotlin · Jetpack Compose · Material 3</p>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/suyziss/Ludora/main/file_00000000267c824690fc0a9b227b0405.png" alt="Suyziss character" width="220" />
+</p>
 
-<p align="center"><img alt="Android" src="https://img.shields.io/badge/platform-Android-3DDC84?logo=android&logoColor=white" /> <img alt="Kotlin" src="https://img.shields.io/badge/language-Kotlin-7F52FF?logo=kotlin&logoColor=white" /> <img alt="Version" src="https://img.shields.io/badge/version-0.0.3%20beta-purple" /> <img alt="Status" src="https://img.shields.io/badge/status-testing-orange" /></p>
+<h1 align="center">SuyzissGram</h1>
+<p align="center"><strong>Your conversations. Your space.</strong><br/>An independent Android messenger project inspired by familiar modern messaging apps.</p>
 
-## Version 0.0.3 βeta
+<p align="center">
+  <img alt="Android" src="https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white" />
+  <img alt="Kotlin" src="https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white" />
+  <img alt="Jetpack Compose" src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4" />
+  <img alt="Version" src="https://img.shields.io/badge/Version-0.0.3%20βeta-8A63D2" />
+  <img alt="Status" src="https://img.shields.io/badge/Status-Testing-orange" />
+</p>
 
-**SuyzissGram is currently in active testing.** The planned online release target is **01.01.2027**. This is a target date, not a guarantee; online launch depends on backend development, testing, security and stability.
+---
 
-The long-term goal is a polished messenger with a familiar Telegram-style interaction model, from the chat list and settings to small everyday chat actions. SuyzissGram is an independent project with its own name and identity; it does not use Telegram's proprietary source code or branding.
+## About
 
-## Current prototype
+**SuyzissGram** is an independent Android messenger being developed with Kotlin and Jetpack Compose. The project aims to deliver a polished, familiar messaging experience, paying attention not only to the main screens but also to the small interactions, settings and customization details that make a messenger comfortable to use.
+
+The project has its own identity and implementation. It is inspired by the interaction patterns of Telegram, but does not use Telegram's proprietary source code or present itself as an official Telegram client.
+
+## Current release — 0.0.3 βeta
+
+<p align="center"><strong>Early development · Local prototype · Android</strong></p>
+
+Available in the current prototype:
 
 - Local Favorites chat with on-device message persistence.
-- Settings screen with language selection (English, Russian, Japanese, Kazakh).
-- Appearance preference selector and text-size preference control (initial settings UI; full visual application is still being developed).
-- Confirmation dialog for clearing locally stored messages.
-- Version label: `0.0.3-beta`.
+- Settings screen with language selection: English, Russian, Japanese and Kazakh.
+- Initial appearance and text-size preference controls.
+- Confirmation before clearing locally stored messages.
+- Back navigation between the main screen, chats and settings.
 
-## Planned Telegram-inspired experience
+Some settings are still being connected to the app's full visual system. The current version is an early prototype, not a finished messenger.
 
-- Chat list, pinned and archived chats, folders, unread counters, drafts and search.
-- Message replies, forwarding, editing, deletion, reactions, selection and context menus.
-- Photos, videos, files, albums, voice messages and media previews.
-- Profiles, contacts, usernames, groups and channels.
-- Light/dark/system themes, accent colors, chat backgrounds and detailed text settings.
-- Privacy controls, app lock, sessions, notifications and account settings.
-- Small interaction details such as swipe actions, typing indicators, delivery states and smooth navigation.
+## Interface and feature roadmap
 
-These are roadmap items, not features already available in the current APK.
+### Chats and navigation
+- [ ] Conversation list with avatars, previews and timestamps.
+- [ ] Pinned and archived chats, folders and unread counters.
+- [ ] Search, drafts and chat-specific settings.
 
-## Current limitations
+### Messaging
+- [ ] Replies, forwarding, editing and deleting messages.
+- [ ] Reactions, message selection and context menus.
+- [ ] Photo, video, file and album sharing.
+- [ ] Voice messages and media previews.
 
-This build is **local-only**, not an online multi-user messenger. It has no account system, server, cloud synchronization, delivery to other users, calls, push notifications or end-to-end encryption. App lock and advanced privacy controls are not implemented. Do not store sensitive information in this test build.
+### Personalization
+- [ ] Fully functional light, dark and system themes.
+- [ ] Accent colors, chat backgrounds and detailed text controls.
+- [ ] Profile, username and avatar customization.
+- [ ] Complete multilingual interface.
 
-## Download the test APK
+### Accounts and online features
+- [ ] Account registration and authentication.
+- [ ] Backend API, database and cloud synchronization.
+- [ ] Real-time messaging, groups and channels.
+- [ ] Push notifications and multi-device sessions.
+- [ ] Privacy controls and application lock.
+
+Roadmap items are planned work; they are not claims about features already implemented.
+
+## Download and test
+
+No stable public release is available yet. Test APKs are produced by GitHub Actions when the build workflow succeeds.
 
 1. Open [GitHub Actions](https://github.com/suyziss/SuyzissGram/actions).
-2. Select the latest successful **Android APK** workflow run.
+2. Select the latest successful Android build.
 3. Download the `SuyzissGram-debug-apk` artifact.
-4. Extract the ZIP and install the APK on an Android test device.
+4. Extract the archive and install the APK on an Android test device.
 
-Debug APKs are test builds and may contain unfinished features or bugs.
+Debug builds may contain unfinished features and bugs. Only install builds you have chosen to test.
 
-## Build locally
+## Build from source
 
-Requirements: Android Studio, JDK 17, Android SDK 35 and Gradle 8.9.
+Requirements: JDK 17, Android SDK 35 and Gradle 8.9.
 
 ```bash
 gradle --no-daemon assembleDebug
 ```
 
-APK output: `app/build/outputs/apk/debug/app-debug.apk`.
+The debug APK is generated at:
 
-## Feedback
+```text
+app/build/outputs/apk/debug/app-debug.apk
+```
 
-Report bugs and suggestions through [GitHub Issues](https://github.com/suyziss/SuyzissGram/issues). Include reproduction steps and device details where possible.
+## Project status
+
+- **Current version:** `0.0.3-beta`
+- **Development status:** active testing
+- **Architecture:** native Android app, Kotlin + Jetpack Compose
+- **Current mode:** local-only prototype
+- **Online release target:** `01.01.2027` (planned target, not a guaranteed release date)
+
+### Current limitations
+
+The current build does not yet provide user accounts, a production server, cloud synchronization, messaging between different users, calls, push notifications or end-to-end encryption. Application lock and advanced privacy protections are also not implemented. Avoid using the prototype to store sensitive information.
+
+## Feedback and contributions
+
+Found a bug or have an idea? Open a [GitHub Issue](https://github.com/suyziss/SuyzissGram/issues). Please include steps to reproduce the issue and your device/Android version.
+
+## Credits
+
+Created by [@suyziss](https://github.com/suyziss). The Suyziss character artwork is maintained in the [Ludora repository](https://github.com/suyziss/Ludora).
 
 ---
 
-<p align="center">Made by <a href="https://github.com/suyziss">@suyziss</a><br /><sub>Testing now · Planned online release: 01.01.2027</sub></p>
+<p align="center"><strong>SuyzissGram</strong><br/><sub>Built independently · Currently in beta testing</sub></p>
