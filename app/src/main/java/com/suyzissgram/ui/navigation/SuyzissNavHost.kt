@@ -27,6 +27,7 @@ import com.suyzissgram.ui.profile.ProfileViewModel
 import com.suyzissgram.ui.settings.SettingsScreen
 import com.suyzissgram.ui.settings.SettingsViewModel
 import com.suyzissgram.ui.theme.SuyzissTheme
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 private object Routes {
@@ -64,16 +65,15 @@ fun SuyzissNavHost(container: AppContainer) {
 
                 LaunchedEffect(state.authenticatedUser) {
                     val user = state.authenticatedUser ?: return@LaunchedEffect
-                    if (state.mode == AuthMode.REGISTER) {
-                        container.profileRepository.updateProfile(
-                            UserProfile(
-                                id = user.id,
-                                email = user.email,
-                                displayName = user.username,
-                                username = user.username
-                            )
+                    val currentProfile = container.profileRepository.observeProfile().first()
+                    container.profileRepository.updateProfile(
+                        currentProfile.copy(
+                            id = user.id,
+                            email = user.email,
+                            displayName = currentProfile.displayName.ifBlank { user.username },
+                            username = user.username
                         )
-                    }
+                    )
                     navController.navigate(Routes.CHATS) {
                         popUpTo(Routes.AUTH) { inclusive = true }
                         launchSingleTop = true
