@@ -68,7 +68,9 @@ fun ProfileScreen(
         } else {
             withContext(Dispatchers.IO) {
                 runCatching {
-                    context.contentResolver.openInputStream(avatarUri)?.use(BitmapFactory::decodeStream)
+                    context.contentResolver.openInputStream(avatarUri)?.use { input ->
+                        BitmapFactory.decodeStream(input)
+                    }
                 }.getOrNull()
             }
         }
