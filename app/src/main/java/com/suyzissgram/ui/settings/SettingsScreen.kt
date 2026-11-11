@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -49,6 +50,7 @@ fun SettingsScreen(
     state: SettingsUiState,
     labels: AppStrings,
     onBack: () -> Unit,
+    onOpenProfile: () -> Unit,
     onLanguage: (AppLanguage) -> Unit,
     onTheme: (ThemeChoice) -> Unit,
     onTextScale: (Float) -> Unit,
@@ -104,6 +106,14 @@ fun SettingsScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            item {
+                SettingsRow(
+                    Icons.Default.Person,
+                    if (state.settings.language == AppLanguage.RU) "Профиль" else "Profile",
+                    if (state.settings.language == AppLanguage.RU) "Имя, фото и описание" else "Name, photo and bio",
+                    onOpenProfile
+                )
+            }
             item { SectionTitle(labels.appearance) }
             item {
                 SettingsRow(Icons.Default.Palette, labels.theme, themeName) { themeExpanded = true }
