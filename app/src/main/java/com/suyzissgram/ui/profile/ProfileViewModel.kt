@@ -51,6 +51,16 @@ class ProfileViewModel(
 
     fun save() = viewModelScope.launch {
         val current = _uiState.value.profile
+        if (!USERNAME_PATTERN.matches(current.username)) {
+            _uiState.update {
+                it.copy(
+                    isSaving = false,
+                    saved = false,
+                    error = "Username должен содержать 4–14 символов: латинские буквы, цифры и _"
+                )
+            }
+            return@launch
+        }
         _uiState.update { it.copy(isSaving = true, saved = false, error = null) }
         runCatching { repository.updateProfile(current) }
             .onSuccess {
@@ -67,6 +77,10 @@ class ProfileViewModel(
                     )
                 }
             }
+    }
+
+    private companion object {
+        val USERNAME_PATTERN = Regex("^[A-Za-z][A-Za-z0-9_]{3,13}$")
     }
 
     private fun updateProfile(transform: (UserProfile) -> UserProfile) {
