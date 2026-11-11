@@ -11,7 +11,7 @@
   <img alt="Android" src="https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white" />
   <img alt="Kotlin" src="https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white" />
   <img alt="Jetpack Compose" src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4" />
-  <img alt="Version" src="https://img.shields.io/badge/Version-0.0.3%20βeta-8A63D2" />
+  <img alt="Version" src="https://img.shields.io/badge/Version-0.8.001%20βeta-8A63D2" />
   <img alt="Status" src="https://img.shields.io/badge/Status-Testing-orange" />
 </p>
 
