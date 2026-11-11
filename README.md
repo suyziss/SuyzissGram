@@ -1,120 +1,62 @@
 # SuyzissGram
 
-<p align="center">
-  <strong>A messenger built around the way you chat.</strong><br />
-  Telegram-inspired Android experience · Kotlin · Jetpack Compose
-</p>
+<p align="center"><strong>A Telegram-inspired Android messenger experience</strong><br />Kotlin · Jetpack Compose · Material 3</p>
 
-<p align="center">
-  <img alt="Android" src="https://img.shields.io/badge/Android-16%2B-3DDC84?logo=android&logoColor=white" />
-  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-7F52FF?logo=kotlin&logoColor=white" />
-  <img alt="Jetpack Compose" src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4" />
-  <img alt="Status" src="https://img.shields.io/badge/status-testing-orange" />
-</p>
+<p align="center"><img alt="Android" src="https://img.shields.io/badge/platform-Android-3DDC84?logo=android&logoColor=white" /> <img alt="Kotlin" src="https://img.shields.io/badge/language-Kotlin-7F52FF?logo=kotlin&logoColor=white" /> <img alt="Version" src="https://img.shields.io/badge/version-0.0.3%20beta-purple" /> <img alt="Status" src="https://img.shields.io/badge/status-testing-orange" /></p>
 
----
+## Version 0.0.3 βeta
 
-## Project status
+**SuyzissGram is currently in active testing.** The planned online release target is **01.01.2027**. This is a target date, not a guarantee; online launch depends on backend development, testing, security and stability.
 
-<p align="center">
-  <strong>Currently in active testing</strong><br />
-  Planned online release: <strong>01 January 2027</strong>
-</p>
+The long-term goal is a polished messenger with a familiar Telegram-style interaction model, from the chat list and settings to small everyday chat actions. SuyzissGram is an independent project with its own name and identity; it does not use Telegram's proprietary source code or branding.
 
-SuyzissGram is an independent Android messenger project. The current build is an early local prototype. We are testing the interface, navigation, message composer and on-device behavior before connecting the app to online services.
+## Current prototype
 
-**The date above is a target, not a promise.** The online release depends on testing, backend development, security work and stability checks.
+- Local Favorites chat with on-device message persistence.
+- Settings screen with language selection (English, Russian, Japanese, Kazakh).
+- Appearance preference selector and text-size preference control (initial settings UI; full visual application is still being developed).
+- Confirmation dialog for clearing locally stored messages.
+- Version label: `0.0.3-beta`.
 
-## The vision
+## Planned Telegram-inspired experience
 
-The goal is to build a full-featured messenger with a familiar, polished chat experience inspired by the usability of Telegram, while developing SuyzissGram as its own product and visual identity.
+- Chat list, pinned and archived chats, folders, unread counters, drafts and search.
+- Message replies, forwarding, editing, deletion, reactions, selection and context menus.
+- Photos, videos, files, albums, voice messages and media previews.
+- Profiles, contacts, usernames, groups and channels.
+- Light/dark/system themes, accent colors, chat backgrounds and detailed text settings.
+- Privacy controls, app lock, sessions, notifications and account settings.
+- Small interaction details such as swipe actions, typing indicators, delivery states and smooth navigation.
 
-Planned experience:
-
-- **Chats:** conversation list, pinned and archived chats, unread counters, drafts and search.
-- **Messaging:** replies, forwards, edits, deletion, reactions, message selection and delivery/read states.
-- **Media:** photo and video sharing, files, voice messages, previews and albums.
-- **People:** profiles, contacts, usernames, groups and channels.
-- **Customization:** light, dark and system themes, accent colors, chat backgrounds, font sizing and language settings.
-- **Privacy:** app lock, session controls and carefully designed privacy settings.
-- **More details:** message context menus, swipe actions, chat folders, notification controls and thoughtful empty/loading states.
-
-These are planned features, not claims about the current beta. They will be introduced and tested in stages.
-
-## What works in the current prototype
-
-- One local **Favorites** conversation.
-- Send messages to the local conversation.
-- Save messages on the device between launches.
-- Interface language options: English, Russian, Japanese and Kazakh.
-- Basic navigation between the chat list and conversation.
+These are roadmap items, not features already available in the current APK.
 
 ## Current limitations
 
-This build is **local-only**. It is not yet an online multi-user messenger.
+This build is **local-only**, not an online multi-user messenger. It has no account system, server, cloud synchronization, delivery to other users, calls, push notifications or end-to-end encryption. App lock and advanced privacy controls are not implemented. Do not store sensitive information in this test build.
 
-- No account registration or sign-in.
-- No message delivery to other users or devices.
-- No cloud synchronization or server-side storage.
-- No calls, push notifications or online presence.
-- No end-to-end encryption in the current prototype.
-
-Do not use the current test build to store sensitive information.
-
-## Testing the Android build
-
-Debug APKs are produced by the GitHub Actions workflow when changes are pushed.
+## Download the test APK
 
 1. Open [GitHub Actions](https://github.com/suyziss/SuyzissGram/actions).
-2. Open the latest successful **Android APK** workflow run.
+2. Select the latest successful **Android APK** workflow run.
 3. Download the `SuyzissGram-debug-apk` artifact.
-4. Extract the ZIP archive and install the APK on an Android test device.
+4. Extract the ZIP and install the APK on an Android test device.
 
-Debug builds are intended for testing and may contain unfinished features or bugs.
+Debug APKs are test builds and may contain unfinished features or bugs.
 
 ## Build locally
 
-Requirements:
-
-- Android Studio (recent stable version)
-- JDK 17
-- Android SDK 35
-- Gradle 8.9
-
-Open the project in Android Studio, sync Gradle and run the `app` configuration. Or build from the command line:
+Requirements: Android Studio, JDK 17, Android SDK 35 and Gradle 8.9.
 
 ```bash
 gradle --no-daemon assembleDebug
 ```
 
-The APK is generated at:
-
-```text
-app/build/outputs/apk/debug/app-debug.apk
-```
-
-## Technology
-
-- Kotlin
-- Jetpack Compose
-- Material 3
-- AndroidX Activity
-
-## Development roadmap
-
-1. **Polish the foundation** — fix navigation, keyboard behavior, localization and responsive layouts.
-2. **Complete the app shell** — settings, themes, profile, chat list, search and chat management.
-3. **Build messaging features** — replies, reactions, editing, forwarding, attachments and voice messages.
-4. **Prepare online infrastructure** — accounts, backend APIs, secure transport, synchronization and notifications.
-5. **Test and release** — closed testing, bug fixes, performance and security review before the planned online launch.
+APK output: `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Feedback
 
-Found a bug or have an idea? Open a [GitHub Issue](https://github.com/suyziss/SuyzissGram/issues) with steps to reproduce it and, if possible, screenshots and device details.
+Report bugs and suggestions through [GitHub Issues](https://github.com/suyziss/SuyzissGram/issues). Include reproduction steps and device details where possible.
 
 ---
 
-<p align="center">
-  Made with care by <a href="https://github.com/suyziss">@suyziss</a><br />
-  <sub>SuyzissGram · Testing now · Online release planned for 01.01.2027</sub>
-</p>
+<p align="center">Made by <a href="https://github.com/suyziss">@suyziss</a><br /><sub>Testing now · Planned online release: 01.01.2027</sub></p>
