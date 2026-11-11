@@ -5,7 +5,7 @@
 </p>
 
 <h1 align="center">SuyzissGram</h1>
-<p align="center"><strong>Your conversations. Your space.</strong><br/>An independent Android messenger project inspired by familiar modern messaging apps.</p>
+<p align="center"><strong>Your conversations. Your space.</strong><br/>An independent Android messenger project with an original Material You interface.</p>
 
 <p align="center">
   <img alt="Android" src="https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white" />
@@ -19,9 +19,7 @@
 
 ## About
 
-**SuyzissGram** is an independent Android messenger being developed with Kotlin and Jetpack Compose. The project aims to deliver a polished, familiar messaging experience, paying attention not only to the main screens but also to the small interactions, settings and customization details that make a messenger comfortable to use.
-
-The project has its own identity and implementation. It is inspired by the interaction patterns of Telegram, but does not use Telegram's proprietary source code or present itself as an official Telegram client.
+**SuyzissGram** is an independent Android messenger developed with Kotlin and Jetpack Compose. Its product goal is broad feature parity with modern messengers, including rich profiles, chats, media, privacy, groups, calls and detailed settings. It uses its own name, code, icons and visual identity. Telegram source code and proprietary assets are not copied.
 
 ## Current release — 0.0.3 βeta
 
@@ -30,13 +28,16 @@ The project has its own identity and implementation. It is inspired by the inter
 Available in the current prototype:
 
 - Local Favorites chat with on-device message persistence.
+- Editable local profile: display name, username and bio.
+- Profile avatar selection through the Android system Photo Picker.
+- Profile data and selected avatar URI saved locally.
 - Settings screen with language selection: English, Russian, Japanese and Kazakh.
 - Functional dark, light and system theme selection.
 - App-wide text scaling preference.
 - Confirmation before clearing locally stored messages.
-- Back navigation between the main screen, chats and settings.
+- Back navigation between the main screen, chats, settings and profile.
 
-The UI has been split into feature packages with ViewModels and repository interfaces. The current version remains an early local prototype, not a finished messenger.
+The profile is a local device profile, not a verified online account. No phone-number verification, server-side username availability check or cloud profile sync exists yet.
 
 ## Architecture
 
@@ -44,8 +45,14 @@ The current package structure, dependency direction, DI decision and future Grad
 
 ## Interface and feature roadmap
 
+### Profile and account
+- [x] Local profile editor for display name, username and bio.
+- [x] Local avatar selection.
+- [ ] Phone number, birthday, privacy visibility and QR profile.
+- [ ] Account registration, verification and cloud profile sync.
+
 ### Chats and navigation
-- [ ] Conversation list with avatars, previews and timestamps.
+- [ ] Conversation list with per-chat avatars, previews and timestamps.
 - [ ] Pinned and archived chats, folders and unread counters.
 - [ ] Search, drafts and chat-specific settings.
 
@@ -56,17 +63,16 @@ The current package structure, dependency direction, DI decision and future Grad
 - [ ] Voice messages and media previews.
 
 ### Personalization
-- [ ] Fully functional light, dark and system themes.
 - [ ] Accent colors, chat backgrounds and detailed text controls.
-- [ ] Profile, username and avatar customization.
-- [ ] Complete multilingual interface.
+- [ ] Full profile privacy controls and complete multilingual resources.
+- [ ] Accessibility, tablet layouts and responsive navigation.
 
-### Accounts and online features
-- [ ] Account registration and authentication.
-- [ ] Backend API, database and cloud synchronization.
+### Online features
+- [ ] Backend API, authentication and cloud synchronization.
 - [ ] Real-time messaging, groups and channels.
 - [ ] Push notifications and multi-device sessions.
-- [ ] Privacy controls and application lock.
+- [ ] Privacy controls, application lock and end-to-end encryption.
+- [ ] Voice and video calls.
 
 Roadmap items are planned work; they are not claims about features already implemented.
 
@@ -105,7 +111,7 @@ app/build/outputs/apk/debug/app-debug.apk
 
 ### Current limitations
 
-The current build does not yet provide user accounts, a production server, cloud synchronization, messaging between different users, calls, push notifications or end-to-end encryption. Application lock and advanced privacy protections are also not implemented. Avoid using the prototype to store sensitive information.
+The current build does not yet provide user accounts, a production server, cloud synchronization, messaging between different users, calls, push notifications or end-to-end encryption. Profile fields are stored only on the current device. Application lock and advanced privacy protections are also not implemented. Avoid using the prototype to store sensitive information.
 
 ## Feedback and contributions
 
