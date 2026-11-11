@@ -100,10 +100,17 @@ class LocalAuthRepository(
             return@withContext AuthResult.Error("Неверный email или пароль")
         }
 
-        val user = AuthUser(accountId, savedEmail, username)
+        val user = AuthUser(getOrMigrateAccountId(accountId), savedEmail, username)
         preferences.edit().putBoolean(KEY_SESSION_ACTIVE, true).apply()
         session.value = user
         AuthResult.Success(user)
+    }
+
+    private fun getOrMigrateAccountId(storedId: String): String {
+        if (ACCOUNT_ID_PATTERN.matches(storedId)) return storedId
+        return generateAccountId().also { newId ->
+            preferences.edit().putString(KEY_ACCOUNT_ID, newId).apply()
+        }
     }
 
     private fun generateAccountId(): String {
@@ -118,7 +125,8 @@ class LocalAuthRepository(
 
     private fun loadSession(): AuthUser? {
         if (!preferences.getBoolean(KEY_SESSION_ACTIVE, false)) return null
-        val id = preferences.getString(KEY_ACCOUNT_ID, null) ?: return null
+        val storedId = preferences.getString(KEY_ACCOUNT_ID, null) ?: return null
+        val id = getOrMigrateAccountId(storedId)
         val email = preferences.getString(KEY_EMAIL, null) ?: return null
         val username = preferences.getString(KEY_USERNAME, null) ?: return null
         return AuthUser(id, email, username)
@@ -143,6 +151,7 @@ class LocalAuthRepository(
     private companion object {
         val EMAIL_PATTERN = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
         val USERNAME_PATTERN = Regex("^[A-Za-z][A-Za-z0-9_]{3,13}$")
+        val ACCOUNT_ID_PATTERN = Regex("^[0-9]{10,13}$")
         const val MIN_PASSWORD_LENGTH = 8
         const val ACCOUNT_ID_LENGTH = 10
         const val SALT_LENGTH = 16
