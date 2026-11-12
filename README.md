@@ -46,10 +46,12 @@ Available in the current prototype:
 - Attachments are stored only on this device and are not uploaded or delivered to another user.
 - Five selectable local chat palettes: Violet, Ocean, Emerald, Sunset and Graphite. The selected palette is saved in app settings.
 - Six profile accent colors. The chosen accent is saved with the local profile and is used on the profile avatar placeholder.
-- A local demo Stars wallet starts with 100 test Stars. Four original vector-style animated gift designs can be selected and recorded in local gift history; the demo balance is reduced on confirmation.
-- Demo Stars cannot be purchased, withdrawn or transferred. Gift records remain on the current device and are not delivered to another account.
+- SuyzissGram Premium profile customization includes nickname colors and a custom profile background color or image.
+- Saved storage quotas are 5 GB for free accounts, 30 GB for Premium accounts and 100 GB for the reserved local owner account `@suyziss` (ID `700200800`).
+- The Premium-only incoming-message preference is stored locally; applying it to messages from other users requires the future backend. Existing conversations are exempt from the filter.
+- Premium pricing is designed at 66% of the corresponding localized Telegram monthly or yearly price (34% lower). Real purchases are not available until server-side payment verification is implemented.
 
-The prototype currently stores one local account per app installation. If a different email is entered while that local account exists, the app asks the user to sign in with the saved email. Email and username uniqueness are not coordinated across devices, and the numeric account ID is generated on-device; production-wide uniqueness must be enforced by the future server database. Email is not verified. Passwords are stored as salted PBKDF2-HMAC-SHA256 hashes, never as plaintext, but local credentials are not yet protected by an online authentication service or Android Keystore-backed encrypted storage. There is no password recovery flow.
+The prototype currently stores one local account per app installation. If a different email is entered while that local account exists, the app asks the user to sign in with the saved email. Email and username uniqueness are not coordinated across devices, and numeric account IDs are generated on-device except for the reserved local owner ID `700200800`; production-wide identity and owner privileges must be enforced by the future server database. Email is not verified. Passwords are stored as salted PBKDF2-HMAC-SHA256 hashes, never as plaintext, but local credentials are not yet protected by an online authentication service or Android Keystore-backed encrypted storage. There is no password recovery flow.
 
 ## Architecture
 
@@ -60,7 +62,8 @@ The current package structure, dependency direction, DI decision and future Grad
 ### Profile and account
 - [x] Local profile editor for display name, username and bio.
 - [x] Local avatar selection.
-- [ ] Phone number, birthday, privacy visibility and QR profile.
+- [x] Profile QR generation and scanning.
+- [x] Local Premium nickname color and profile background customization.
 - [x] Local email/password registration and sign-in without email-code verification.
 - [ ] Server-side account creation, globally unique ID allocation, password recovery and cloud profile sync.
 
@@ -74,15 +77,14 @@ The current package structure, dependency direction, DI decision and future Grad
 - [ ] Reactions, message selection and context menus.
 - [x] Photo, video, file and album selection for local attachment messages.
 - [x] Local chat palette selection from the chat toolbar.
-- [x] Local demo gift sending and wallet history.
 - [ ] Voice messages and media previews.
 
 ### Personalization
 - [x] Five local chat color palettes.
 - [x] Local profile accent color selection.
-- [x] Demo Stars wallet, original animated vector gift catalog and local gift history.
+- [x] Local Premium storage quotas and profile appearance settings.
 - [ ] Custom chat backgrounds and detailed text controls.
-- [ ] Profile themes and decorative profile elements.
+- [ ] Server-verified Premium subscriptions and cloud-synced profile themes.
 - [ ] Full profile privacy controls and complete multilingual resources.
 - [ ] Accessibility, tablet layouts and responsive navigation.
 
@@ -130,7 +132,7 @@ app/build/outputs/apk/debug/app-debug.apk
 
 ### Current limitations
 
-The current build does not yet provide user accounts, a production server, cloud synchronization, messaging between different users, calls, push notifications or end-to-end encryption. Profile fields are stored only on the current device. Application lock and advanced privacy protections are also not implemented. Avoid using the prototype to store sensitive information.
+The current build does not yet provide a production server, cloud synchronization, messaging between different users, calls, push notifications, verified Premium payments or end-to-end encryption. Profile fields and Premium preferences are stored only on the current device. The reserved owner ID and local Premium flag are not secure identity credentials and must be validated by the future backend. Application lock and advanced privacy protections are also not implemented. Avoid using the prototype to store sensitive information.
 
 ## Feedback and contributions
 
