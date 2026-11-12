@@ -65,7 +65,7 @@ class ChatViewModel(
                 repository.sendAttachment(sourceUri, displayName, mimeType, kind, quality)
             }.onFailure { throwable ->
                 _uiState.update {
-                    it.copy(error = throwable.message ?: "Unable to save attachment")
+                    it.copy(error = if (throwable.message == "FAVORITES_LIMIT_REACHED") "Достигнут лимит хранилища избранного. Удалите часть вложений или увеличьте лимит с Premium." else (throwable.message ?: "Unable to save attachment"))
                 }
             }
             _uiState.update { it.copy(isSendingAttachment = false) }

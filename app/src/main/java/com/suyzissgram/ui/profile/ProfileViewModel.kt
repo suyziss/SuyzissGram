@@ -53,6 +53,18 @@ class ProfileViewModel(
         it.copy(accentColor = color)
     }
 
+    fun onNicknameColorChanged(color: Long) = updateProfile {
+        it.copy(nicknameColor = color)
+    }
+
+    fun onProfileBackgroundColorChanged(color: Long) = updateProfile {
+        it.copy(profileBackgroundColor = color, profileBackgroundImageUri = null)
+    }
+
+    fun onProfileBackgroundImageChanged(uri: String?) = updateProfile {
+        it.copy(profileBackgroundImageUri = uri)
+    }
+
     fun save() = viewModelScope.launch {
         val current = _uiState.value.profile
         if (!USERNAME_PATTERN.matches(current.username)) {

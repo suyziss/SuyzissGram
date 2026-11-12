@@ -32,6 +32,10 @@ class FakeSettingsRepository(
         update(settings.value.copy(chatTheme = theme.coerceIn(0, MAX_CHAT_THEME)))
     }
 
+    override suspend fun setOnlyPremiumMessages(enabled: Boolean) {
+        update(settings.value.copy(onlyPremiumMessages = enabled))
+    }
+
     private fun update(value: AppSettings) {
         settings.value = value
         preferences.edit()
@@ -39,6 +43,7 @@ class FakeSettingsRepository(
             .putString(KEY_THEME, value.theme.name)
             .putFloat(KEY_TEXT_SCALE, value.textScale)
             .putInt(KEY_CHAT_THEME, value.chatTheme)
+            .putBoolean(KEY_ONLY_PREMIUM_MESSAGES, value.onlyPremiumMessages)
             .apply()
     }
 
@@ -54,7 +59,8 @@ class FakeSettingsRepository(
             language = language,
             theme = theme,
             textScale = preferences.getFloat(KEY_TEXT_SCALE, 1f).coerceIn(0.85f, 1.25f),
-            chatTheme = preferences.getInt(KEY_CHAT_THEME, 0).coerceIn(0, MAX_CHAT_THEME)
+            chatTheme = preferences.getInt(KEY_CHAT_THEME, 0).coerceIn(0, MAX_CHAT_THEME),
+            onlyPremiumMessages = preferences.getBoolean(KEY_ONLY_PREMIUM_MESSAGES, false)
         )
     }
 
@@ -63,6 +69,7 @@ class FakeSettingsRepository(
         const val KEY_THEME = "theme"
         const val KEY_TEXT_SCALE = "text_scale"
         const val KEY_CHAT_THEME = "chat_theme"
+        const val KEY_ONLY_PREMIUM_MESSAGES = "only_premium_messages"
         const val MAX_CHAT_THEME = 4
     }
 }

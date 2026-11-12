@@ -1,10 +1,17 @@
 package com.suyzissgram.ui.navigation
 
+import android.content.Intent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -20,10 +27,11 @@ import com.suyzissgram.ui.chatlist.ChatListScreen
 import com.suyzissgram.ui.chatlist.ChatListViewModel
 import com.suyzissgram.ui.common.viewModelFactory
 import com.suyzissgram.ui.i18n.AppStrings
-import com.suyzissgram.ui.gifts.GiftViewModel
-import com.suyzissgram.ui.gifts.GiftsScreen
 import com.suyzissgram.ui.profile.ProfileScreen
 import com.suyzissgram.ui.profile.ProfileViewModel
+import com.suyzissgram.ui.profile.ProfileQrScreen
+import com.suyzissgram.ui.profile.profileShareUri
+import com.suyzissgram.domain.model.UserProfile
 import com.suyzissgram.ui.settings.SettingsScreen
 import com.suyzissgram.ui.settings.SettingsViewModel
 import com.suyzissgram.ui.theme.SuyzissTheme
@@ -36,7 +44,7 @@ private object Routes {
     const val CHAT = "chat/{chatId}"
     const val SETTINGS = "settings"
     const val PROFILE = "profile"
-    const val GIFTS = "gifts"
+    const val PROFILE_QR = "profile/qr"
     fun chat(chatId: String) = "chat/$chatId"
 }
 
@@ -51,13 +59,21 @@ fun SuyzissNavHost(container: AppContainer) {
     val labels = AppStrings.forLanguage(settingsState.settings.language)
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val startDestination = if (session == null) Routes.AUTH else Routes.CHATS
 
     SuyzissTheme(
         themeChoice = settingsState.settings.theme,
         textScale = settingsState.settings.textScale
     ) {
-        NavHost(navController = navController, startDestination = startDestination) {
+        NavHost(
+            navController = navController,
+            startDestination = startDestination,
+            enterTransition = { fadeIn(tween(320)) + slideInHorizontally(initialOffsetX = { it / 5 }, animationSpec = tween(320)) },
+            exitTransition = { fadeOut(tween(220)) + slideOutHorizontally(targetOffsetX = { -it / 7 }, animationSpec = tween(220)) },
+            popEnterTransition = { fadeIn(tween(300)) + slideInHorizontally(initialOffsetX = { -it / 5 }, animationSpec = tween(300)) },
+            popExitTransition = { fadeOut(tween(220)) + slideOutHorizontally(targetOffsetX = { it / 7 }, animationSpec = tween(220)) }
+        ) {
             composable(Routes.AUTH) {
                 val viewModel: AuthViewModel = viewModel(
                     factory = viewModelFactory { AuthViewModel(container.authRepository) }
@@ -122,23 +138,8 @@ fun SuyzissNavHost(container: AppContainer) {
                     onSendLocation = viewModel::sendLocation,
                     chatTheme = settingsState.settings.chatTheme,
                     onChatThemeChange = settingsViewModel::setChatTheme,
-                    onOpenGifts = { navController.navigate(Routes.GIFTS) },
                     onBack = { navController.popBackStack() },
                     onOpenProfile = { navController.navigate(Routes.PROFILE) }
-                )
-            }
-
-            composable(Routes.GIFTS) {
-                val giftViewModel: GiftViewModel = viewModel(
-                    factory = viewModelFactory { GiftViewModel(container.giftRepository) }
-                )
-                val giftState by giftViewModel.uiState.collectAsStateWithLifecycle()
-                GiftsScreen(
-                    state = giftState,
-                    language = settingsState.settings.language,
-                    onBack = { navController.popBackStack() },
-                    onSendGift = giftViewModel::sendGift,
-                    onClearError = giftViewModel::clearError
                 )
             }
 
@@ -153,7 +154,11 @@ fun SuyzissNavHost(container: AppContainer) {
                     onTextScale = settingsViewModel::setTextScale,
                     onClearMessages = {
                         scope.launch { container.chatRepository.clearMessages() }
-                    }
+                    },
+                    userId = container.authRepository.currentSession()?.id.orEmpty(),
+                    isPremium = container.isPremiumUser(container.authRepository.currentSession()?.id.orEmpty()),
+                    favoritesLimitGb = container.favoritesLimitGb(container.authRepository.currentSession()?.id.orEmpty()),
+                    onOnlyPremiumMessagesChange = settingsViewModel::setOnlyPremiumMessages
                 )
             }
 
@@ -165,13 +170,36 @@ fun SuyzissNavHost(container: AppContainer) {
                 ProfileScreen(
                     state = state,
                     language = settingsState.settings.language,
+                    isPremium = container.isPremiumUser(state.profile.id),
                     onBack = { navController.popBackStack() },
                     onDisplayNameChange = viewModel::onDisplayNameChanged,
                     onUsernameChange = viewModel::onUsernameChanged,
                     onBioChange = viewModel::onBioChanged,
                     onAvatarChange = viewModel::onAvatarChanged,
                     onAccentColorChange = viewModel::onAccentColorChanged,
+                    onNicknameColorChange = viewModel::onNicknameColorChanged,
+                    onProfileBackgroundColorChange = viewModel::onProfileBackgroundColorChanged,
+                    onProfileBackgroundImageChange = viewModel::onProfileBackgroundImageChanged,
+                    onShareProfile = {
+                        val profile = state.profile
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, "${profile.displayName.ifBlank { profile.username }} · @${profile.username}\n${profileShareUri(profile.username)}")
+                        }
+                        context.startActivity(Intent.createChooser(shareIntent, if (settingsState.settings.language == com.suyzissgram.domain.model.AppLanguage.RU) "Поделиться профилем" else "Share profile"))
+                    },
+                    onOpenQr = { navController.navigate(Routes.PROFILE_QR) },
                     onSave = viewModel::save
+                )
+            }
+
+            composable(Routes.PROFILE_QR) {
+                val profile by container.profileRepository.observeProfile().collectAsStateWithLifecycle(initialValue = UserProfile())
+                ProfileQrScreen(
+                    profile = profile,
+                    language = settingsState.settings.language,
+                    onBack = { navController.popBackStack() },
+                    onOpenOwnProfile = { navController.popBackStack(Routes.PROFILE, inclusive = false) }
                 )
             }
         }

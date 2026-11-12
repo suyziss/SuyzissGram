@@ -11,4 +11,5 @@ interface SettingsRepository {
     suspend fun setTheme(theme: ThemeChoice)
     suspend fun setTextScale(scale: Float)
     suspend fun setChatTheme(theme: Int)
+    suspend fun setOnlyPremiumMessages(enabled: Boolean)
 }

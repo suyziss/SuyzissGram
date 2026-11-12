@@ -34,6 +34,9 @@ class FakeProfileRepository(
             .putString(KEY_BIO, normalized.bio)
             .putString(KEY_AVATAR_URI, normalized.avatarUri)
             .putLong(KEY_ACCENT_COLOR, normalized.accentColor)
+            .putLong(KEY_NICKNAME_COLOR, normalized.nicknameColor)
+            .putLong(KEY_PROFILE_BACKGROUND_COLOR, normalized.profileBackgroundColor)
+            .putString(KEY_PROFILE_BACKGROUND_IMAGE_URI, normalized.profileBackgroundImageUri)
             .apply()
     }
 
@@ -44,7 +47,10 @@ class FakeProfileRepository(
         username = preferences.getString(KEY_USERNAME, "").orEmpty(),
         bio = preferences.getString(KEY_BIO, "").orEmpty(),
         avatarUri = preferences.getString(KEY_AVATAR_URI, null),
-        accentColor = preferences.getLong(KEY_ACCENT_COLOR, DEFAULT_ACCENT_COLOR)
+        accentColor = preferences.getLong(KEY_ACCENT_COLOR, DEFAULT_ACCENT_COLOR),
+        nicknameColor = preferences.getLong(KEY_NICKNAME_COLOR, DEFAULT_NICKNAME_COLOR),
+        profileBackgroundColor = preferences.getLong(KEY_PROFILE_BACKGROUND_COLOR, DEFAULT_PROFILE_BACKGROUND_COLOR),
+        profileBackgroundImageUri = preferences.getString(KEY_PROFILE_BACKGROUND_IMAGE_URI, null)
     )
 
     private companion object {
@@ -55,9 +61,14 @@ class FakeProfileRepository(
         const val KEY_BIO = "profile_bio"
         const val KEY_AVATAR_URI = "profile_avatar_uri"
         const val KEY_ACCENT_COLOR = "profile_accent_color"
+        const val KEY_NICKNAME_COLOR = "profile_nickname_color"
+        const val KEY_PROFILE_BACKGROUND_COLOR = "profile_background_color"
+        const val KEY_PROFILE_BACKGROUND_IMAGE_URI = "profile_background_image_uri"
         const val MAX_NAME_LENGTH = 64
         const val MAX_USERNAME_LENGTH = 14
         const val MAX_BIO_LENGTH = 120
         const val DEFAULT_ACCENT_COLOR = 0xFF9B7BFFL
+        const val DEFAULT_NICKNAME_COLOR = 0xFFFFFFFFL
+        const val DEFAULT_PROFILE_BACKGROUND_COLOR = 0xFF17151FL
     }
 }

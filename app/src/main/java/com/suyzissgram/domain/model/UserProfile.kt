@@ -7,5 +7,8 @@ data class UserProfile(
     val username: String = "",
     val bio: String = "",
     val avatarUri: String? = null,
-    val accentColor: Long = 0xFF9B7BFFL
+    val accentColor: Long = 0xFF9B7BFFL,
+    val nicknameColor: Long = 0xFFFFFFFFL,
+    val profileBackgroundColor: Long = 0xFF17151F,
+    val profileBackgroundImageUri: String? = null
 )

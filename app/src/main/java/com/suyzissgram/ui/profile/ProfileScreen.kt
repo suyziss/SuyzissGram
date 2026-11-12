@@ -5,6 +5,10 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,6 +20,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -24,6 +29,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -38,6 +45,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -63,17 +71,25 @@ private val profileAccentColors = listOf(
 fun ProfileScreen(
     state: ProfileUiState,
     language: AppLanguage,
+    isPremium: Boolean,
     onBack: () -> Unit,
     onDisplayNameChange: (String) -> Unit,
     onUsernameChange: (String) -> Unit,
     onBioChange: (String) -> Unit,
     onAvatarChange: (String?) -> Unit,
     onAccentColorChange: (Long) -> Unit,
+    onNicknameColorChange: (Long) -> Unit,
+    onProfileBackgroundColorChange: (Long) -> Unit,
+    onProfileBackgroundImageChange: (String?) -> Unit,
+    onShareProfile: () -> Unit,
+    onOpenQr: () -> Unit,
     onSave: () -> Unit
 ) {
     val isRussian = language == AppLanguage.RU
     val context = LocalContext.current
     val avatarUri = state.profile.avatarUri?.let(Uri::parse)
+    val backgroundUri = state.profile.profileBackgroundImageUri?.let(Uri::parse)
+    val avatarScale by animateFloatAsState(if (state.isSaving) 0.84f else 1f, spring(stiffness = Spring.StiffnessLow), label = "profile_avatar_scale")
 
     val avatarBitmap by produceState<android.graphics.Bitmap?>(initialValue = null, avatarUri) {
         value = if (avatarUri == null) {
@@ -86,6 +102,21 @@ fun ProfileScreen(
                     }
                 }.getOrNull()
             }
+        }
+    }
+
+    val backgroundBitmap by produceState<android.graphics.Bitmap?>(initialValue = null, backgroundUri) {
+        value = if (backgroundUri == null) null else withContext(Dispatchers.IO) {
+            runCatching { context.contentResolver.openInputStream(backgroundUri)?.use { input -> BitmapFactory.decodeStream(input) } }.getOrNull()
+        }
+    }
+
+    val backgroundPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) {
+            runCatching { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+            onProfileBackgroundImageChange(uri.toString())
         }
     }
 
@@ -123,12 +154,12 @@ fun ProfileScreen(
         }
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp).animateContentSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Box(
-                modifier = Modifier.size(112.dp).clip(CircleShape)
+                modifier = Modifier.size(112.dp).then(Modifier.graphicsLayer { scaleX = avatarScale; scaleY = avatarScale }).clip(CircleShape)
                     .background(Color(state.profile.accentColor.toInt()).copy(alpha = 0.20f)),
                 contentAlignment = Alignment.Center
             ) {
@@ -163,6 +194,26 @@ fun ProfileScreen(
                 }
             }
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Button(onClick = onShareProfile, modifier = Modifier.weight(1f), shape = RoundedCornerShape(14.dp)) {
+                    Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.size(7.dp))
+                    Text(if (isRussian) "Поделиться" else "Share")
+                }
+                androidx.compose.material3.OutlinedButton(
+                    onClick = onOpenQr,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Icon(Icons.Default.QrCode2, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.size(7.dp))
+                    Text(if (isRussian) "Мой QR" else "My QR")
+                }
+            }
+
             Column(Modifier.fillMaxWidth()) {
                 Text(
                     if (isRussian) "Цвет профиля" else "Profile accent",
@@ -189,6 +240,71 @@ fun ProfileScreen(
                         )
                     }
                 }
+            }
+
+            if (isPremium) {
+                Column(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
+                        .background(MaterialTheme.colorScheme.surface).padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(if (isRussian) "Premium оформление" else "Premium appearance", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+                    Box(
+                        Modifier.fillMaxWidth().height(118.dp).clip(RoundedCornerShape(14.dp))
+                            .background(Color(state.profile.profileBackgroundColor.toInt())),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (backgroundBitmap != null) {
+                            Image(
+                                bitmap = backgroundBitmap!!.asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                        Column(Modifier.padding(16.dp)) {
+                            Text(state.profile.displayName.ifBlank { state.profile.username }, color = Color(state.profile.nicknameColor.toInt()), fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                            Text("@${state.profile.username}", color = Color(state.profile.nicknameColor.toInt()).copy(alpha = .82f), fontSize = 13.sp)
+                        }
+                    }
+                    Text(if (isRussian) "Цвет ника" else "Nickname color", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        listOf(0xFFFFFFFFL, 0xFFFFD166L, 0xFF7BDFF2L, 0xFFFF8FABL, 0xFFB8F2A1L, 0xFFC4A1FFL).forEach { color ->
+                            Box(
+                                Modifier.size(28.dp).clip(CircleShape).background(Color(color.toInt()))
+                                    .clickable { onNicknameColorChange(color) }
+                                    .then(if (state.profile.nicknameColor == color) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, CircleShape) else Modifier)
+                            )
+                        }
+                    }
+                    Text(if (isRussian) "Фон профиля" else "Profile background", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        listOf(0xFF17151FL, 0xFF17243AL, 0xFF17352BL, 0xFF3B2037L, 0xFF3B2B1AL, 0xFF28243BL).forEach { color ->
+                            Box(
+                                Modifier.size(28.dp).clip(CircleShape).background(Color(color.toInt()))
+                                    .clickable { onProfileBackgroundColorChange(color) }
+                                    .then(if (state.profile.profileBackgroundColor == color && backgroundUri == null) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, CircleShape) else Modifier)
+                            )
+                        }
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        TextButton(onClick = { backgroundPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
+                            Text(if (isRussian) "Выбрать изображение" else "Choose image")
+                        }
+                        if (backgroundUri != null) {
+                            TextButton(onClick = { onProfileBackgroundImageChange(null) }) {
+                                Text(if (isRussian) "Убрать фон" else "Remove image")
+                            }
+                        }
+                    }
+                }
+            } else {
+                Text(
+                    if (isRussian) "Цвет ника и собственный фон доступны в SuyzissGram Premium." else "Custom nickname colors and profile backgrounds require SuyzissGram Premium.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
 
             if (state.profile.id.isNotBlank()) {
