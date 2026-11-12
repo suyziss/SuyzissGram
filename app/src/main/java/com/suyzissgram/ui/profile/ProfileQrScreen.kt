@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.Color as AndroidColor
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.CameraSelector
@@ -44,6 +45,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -132,6 +134,33 @@ fun ProfileQrScreen(
     val scanner = remember {
         val options = BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
         BarcodeScanning.getClient(options)
+    }
+    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            scanHandled.set(false)
+            scanResult = null
+            scanError = null
+            runCatching { InputImage.fromFilePath(context, uri) }
+                .onSuccess { input ->
+                    scanner.process(input)
+                        .addOnSuccessListener { barcodes ->
+                            val raw = barcodes.firstNotNullOfOrNull { it.rawValue }
+                            val username = raw?.let(::parseProfileQr)
+                            if (username != null) {
+                                scanHandled.set(true)
+                                scanResult = username
+                            } else {
+                                scanError = if (isRu) "На изображении нет QR-ссылки профиля SuyzissGram." else "No SuyzissGram profile QR was found in the image."
+                            }
+                        }
+                        .addOnFailureListener {
+                            scanError = if (isRu) "Не удалось распознать изображение." else "Could not scan the image."
+                        }
+                }
+                .onFailure {
+                    scanError = if (isRu) "Не удалось открыть изображение." else "Could not open the image."
+                }
+        }
     }
     val analysisExecutor = remember { Executors.newSingleThreadExecutor() }
     val scanHandled = remember { AtomicBoolean(false) }
@@ -293,6 +322,16 @@ fun ProfileQrScreen(
                                 }
                             }
                         }
+                    }
+                    OutlinedButton(
+                        onClick = {
+                            imagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        },
+                        modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
+                    ) {
+                        Icon(Icons.Default.Image, contentDescription = null)
+                        Spacer(Modifier.size(8.dp))
+                        Text(if (isRu) "Выбрать QR из изображения" else "Choose QR image")
                     }
                     scanError?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(12.dp)) }
                     Spacer(Modifier.height(16.dp))
