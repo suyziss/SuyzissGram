@@ -156,6 +156,8 @@ fun SuyzissNavHost(container: AppContainer) {
                         scope.launch { container.chatRepository.clearMessages() }
                     },
                     userId = container.authRepository.currentSession()?.id.orEmpty(),
+                    isPremium = container.isPremiumUser(container.authRepository.currentSession()?.id.orEmpty()),
+                    favoritesLimitGb = container.favoritesLimitGb(container.authRepository.currentSession()?.id.orEmpty()),
                     onOnlyPremiumMessagesChange = settingsViewModel::setOnlyPremiumMessages
                 )
             }
@@ -168,6 +170,7 @@ fun SuyzissNavHost(container: AppContainer) {
                 ProfileScreen(
                     state = state,
                     language = settingsState.settings.language,
+                    isPremium = container.isPremiumUser(state.profile.id),
                     onBack = { navController.popBackStack() },
                     onDisplayNameChange = viewModel::onDisplayNameChanged,
                     onUsernameChange = viewModel::onUsernameChanged,
