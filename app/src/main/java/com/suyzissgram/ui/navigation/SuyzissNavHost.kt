@@ -27,8 +27,6 @@ import com.suyzissgram.ui.chatlist.ChatListScreen
 import com.suyzissgram.ui.chatlist.ChatListViewModel
 import com.suyzissgram.ui.common.viewModelFactory
 import com.suyzissgram.ui.i18n.AppStrings
-import com.suyzissgram.ui.gifts.GiftViewModel
-import com.suyzissgram.ui.gifts.GiftsScreen
 import com.suyzissgram.ui.profile.ProfileScreen
 import com.suyzissgram.ui.profile.ProfileViewModel
 import com.suyzissgram.ui.profile.ProfileQrScreen
@@ -47,7 +45,6 @@ private object Routes {
     const val SETTINGS = "settings"
     const val PROFILE = "profile"
     const val PROFILE_QR = "profile/qr"
-    const val GIFTS = "gifts"
     fun chat(chatId: String) = "chat/$chatId"
 }
 
@@ -72,10 +69,10 @@ fun SuyzissNavHost(container: AppContainer) {
         NavHost(
             navController = navController,
             startDestination = startDestination,
-            enterTransition = { fadeIn(tween(220)) + slideInHorizontally(initialOffsetX = { it / 14 }, animationSpec = tween(220)) },
-            exitTransition = { fadeOut(tween(150)) + slideOutHorizontally(targetOffsetX = { -it / 24 }, animationSpec = tween(150)) },
-            popEnterTransition = { fadeIn(tween(200)) + slideInHorizontally(initialOffsetX = { -it / 18 }, animationSpec = tween(200)) },
-            popExitTransition = { fadeOut(tween(150)) + slideOutHorizontally(targetOffsetX = { it / 18 }, animationSpec = tween(150)) }
+            enterTransition = { fadeIn(tween(320)) + slideInHorizontally(initialOffsetX = { it / 5 }, animationSpec = tween(320)) },
+            exitTransition = { fadeOut(tween(220)) + slideOutHorizontally(targetOffsetX = { -it / 7 }, animationSpec = tween(220)) },
+            popEnterTransition = { fadeIn(tween(300)) + slideInHorizontally(initialOffsetX = { -it / 5 }, animationSpec = tween(300)) },
+            popExitTransition = { fadeOut(tween(220)) + slideOutHorizontally(targetOffsetX = { it / 7 }, animationSpec = tween(220)) }
         ) {
             composable(Routes.AUTH) {
                 val viewModel: AuthViewModel = viewModel(
@@ -141,23 +138,8 @@ fun SuyzissNavHost(container: AppContainer) {
                     onSendLocation = viewModel::sendLocation,
                     chatTheme = settingsState.settings.chatTheme,
                     onChatThemeChange = settingsViewModel::setChatTheme,
-                    onOpenGifts = { navController.navigate(Routes.GIFTS) },
                     onBack = { navController.popBackStack() },
                     onOpenProfile = { navController.navigate(Routes.PROFILE) }
-                )
-            }
-
-            composable(Routes.GIFTS) {
-                val giftViewModel: GiftViewModel = viewModel(
-                    factory = viewModelFactory { GiftViewModel(container.giftRepository) }
-                )
-                val giftState by giftViewModel.uiState.collectAsStateWithLifecycle()
-                GiftsScreen(
-                    state = giftState,
-                    language = settingsState.settings.language,
-                    onBack = { navController.popBackStack() },
-                    onSendGift = giftViewModel::sendGift,
-                    onClearError = giftViewModel::clearError
                 )
             }
 
@@ -172,7 +154,9 @@ fun SuyzissNavHost(container: AppContainer) {
                     onTextScale = settingsViewModel::setTextScale,
                     onClearMessages = {
                         scope.launch { container.chatRepository.clearMessages() }
-                    }
+                    },
+                    userId = container.authRepository.currentSession()?.id.orEmpty(),
+                    onOnlyPremiumMessagesChange = settingsViewModel::setOnlyPremiumMessages
                 )
             }
 
