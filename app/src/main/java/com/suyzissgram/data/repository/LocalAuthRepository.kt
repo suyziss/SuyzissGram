@@ -55,7 +55,7 @@ class LocalAuthRepository(
         val passwordHash = derivePasswordHash(password, salt)
         password.fill('\u0000')
         val user = AuthUser(
-            id = generateAccountId(),
+            id = if (normalizedUsername.equals(OWNER_USERNAME, ignoreCase = true)) OWNER_ACCOUNT_ID else generateAccountId(),
             email = normalizedEmail,
             username = normalizedUsername
         )
@@ -119,17 +119,19 @@ class LocalAuthRepository(
             return@withContext AuthResult.Error("Неверный email или пароль")
         }
 
-        val user = AuthUser(getOrMigrateAccountId(accountId), savedEmail, username)
+        val user = AuthUser(getOrMigrateAccountId(accountId, username), savedEmail, username)
         preferences.edit().putBoolean(KEY_SESSION_ACTIVE, true).apply()
         session.value = user
         AuthResult.Success(user)
     }
 
-    private fun getOrMigrateAccountId(storedId: String): String {
-        if (ACCOUNT_ID_PATTERN.matches(storedId)) return storedId
-        return generateAccountId().also { newId ->
-            preferences.edit().putString(KEY_ACCOUNT_ID, newId).apply()
+    private fun getOrMigrateAccountId(storedId: String, username: String): String {
+        val expectedId = if (username.equals(OWNER_USERNAME, ignoreCase = true)) OWNER_ACCOUNT_ID else storedId
+        if (ACCOUNT_ID_PATTERN.matches(expectedId)) {
+            if (expectedId != storedId) preferences.edit().putString(KEY_ACCOUNT_ID, expectedId).apply()
+            return expectedId
         }
+        return generateAccountId().also { newId -> preferences.edit().putString(KEY_ACCOUNT_ID, newId).apply() }
     }
 
     private fun generateAccountId(): String {
@@ -145,9 +147,9 @@ class LocalAuthRepository(
     private fun loadSession(): AuthUser? {
         if (!preferences.getBoolean(KEY_SESSION_ACTIVE, false)) return null
         val storedId = preferences.getString(KEY_ACCOUNT_ID, null) ?: return null
-        val id = getOrMigrateAccountId(storedId)
-        val email = preferences.getString(KEY_EMAIL, null) ?: return null
         val username = preferences.getString(KEY_USERNAME, null) ?: return null
+        val id = getOrMigrateAccountId(storedId, username)
+        val email = preferences.getString(KEY_EMAIL, null) ?: return null
         return AuthUser(id, email, username)
     }
 
@@ -171,6 +173,8 @@ class LocalAuthRepository(
         val EMAIL_PATTERN = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
         val USERNAME_PATTERN = Regex("^[A-Za-z][A-Za-z0-9_]{3,13}$")
         val ACCOUNT_ID_PATTERN = Regex("^[0-9]{10,13}$")
+        const val OWNER_USERNAME = "suyziss"
+        const val OWNER_ACCOUNT_ID = "700200800"
         const val MIN_PASSWORD_LENGTH = 8
         const val ACCOUNT_ID_LENGTH = 10
         const val SALT_LENGTH = 16
