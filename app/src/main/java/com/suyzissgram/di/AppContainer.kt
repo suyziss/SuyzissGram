@@ -5,10 +5,8 @@ import com.suyzissgram.data.repository.FakeChatRepository
 import com.suyzissgram.data.repository.FakeProfileRepository
 import com.suyzissgram.data.repository.FakeSettingsRepository
 import com.suyzissgram.data.repository.LocalAuthRepository
-import com.suyzissgram.data.repository.LocalGiftRepository
 import com.suyzissgram.domain.repository.AuthRepository
 import com.suyzissgram.domain.repository.ChatRepository
-import com.suyzissgram.domain.repository.GiftRepository
 import com.suyzissgram.domain.repository.ProfileRepository
 import com.suyzissgram.domain.repository.SettingsRepository
 
@@ -23,7 +21,6 @@ class AppContainer(context: Context) {
     val chatRepository: ChatRepository = FakeChatRepository(appContext, preferences)
     val settingsRepository: SettingsRepository = FakeSettingsRepository(preferences)
     val profileRepository: ProfileRepository = FakeProfileRepository(preferences)
-    val giftRepository: GiftRepository = LocalGiftRepository(preferences)
 
     private companion object {
         const val PREFERENCES_NAME = "suyzissgram_local"
