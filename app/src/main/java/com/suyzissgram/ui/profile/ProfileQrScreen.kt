@@ -12,9 +12,11 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -33,6 +35,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,7 +55,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,6 +80,7 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.suyzissgram.domain.model.AppLanguage
 import com.suyzissgram.domain.model.UserProfile
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 
 private const val PROFILE_SCHEME = "suyzissgram"
 private val USERNAME_QR_PATTERN = Regex("^[A-Za-z][A-Za-z0-9_]{3,13}$")
@@ -131,6 +134,9 @@ fun ProfileQrScreen(
         BarcodeScanning.getClient(options)
     }
     val analysisExecutor = remember { Executors.newSingleThreadExecutor() }
+    val scanHandled = remember { AtomicBoolean(false) }
+    val sweepTransition = rememberInfiniteTransition(label = "qr_scan_sweep")
+    val sweepPosition by sweepTransition.animateFloat(0f, 1f, infiniteRepeatable(tween(1800, easing = LinearEasing), RepeatMode.Reverse), label = "qr_scan_line")
 
     DisposableEffect(cameraController, scanner, analysisExecutor) {
         onDispose {
@@ -237,7 +243,7 @@ fun ProfileQrScreen(
                                                 scanner.process(image)
                                                     .addOnSuccessListener { barcodes ->
                                                         val raw = barcodes.firstNotNullOfOrNull { it.rawValue }
-                                                        if (raw != null && scanResult == null) {
+                                                        if (raw != null && scanHandled.compareAndSet(false, true)) {
                                                             val username = parseProfileQr(raw)
                                                             if (username != null) scanResult = username
                                                             else scanError = if (isRu) "QR найден, но это не ссылка профиля SuyzissGram." else "QR found, but it is not a SuyzissGram profile link."
@@ -250,6 +256,7 @@ fun ProfileQrScreen(
                                 }
                             )
                             Box(Modifier.align(Alignment.Center).size(244.dp).border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(22.dp)))
+                            Box(Modifier.align(Alignment.Center).fillMaxWidth(.68f).offset(y = ((sweepPosition - .5f) * 220f).dp).height(2.dp).background(MaterialTheme.colorScheme.primary))
                             Text(if (isRu) "Поместите QR-код в рамку" else "Place the QR code inside the frame",
                                 modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)
                                     .clip(RoundedCornerShape(50)).background(androidx.compose.ui.graphics.Color.Black.copy(alpha = .68f)).padding(horizontal = 14.dp, vertical = 8.dp),
