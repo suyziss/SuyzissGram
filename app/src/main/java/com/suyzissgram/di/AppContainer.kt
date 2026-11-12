@@ -28,6 +28,16 @@ class AppContainer(context: Context) {
     val settingsRepository: SettingsRepository = FakeSettingsRepository(preferences)
     val profileRepository: ProfileRepository = FakeProfileRepository(preferences)
 
+    fun isPremiumUser(userId: String): Boolean {
+        val purchasedPremium = preferences.getBoolean("premium_active_$userId", false)
+        return PremiumPolicy.isPremium(userId, purchasedPremium)
+    }
+
+    fun favoritesLimitGb(userId: String): Int {
+        val purchasedPremium = preferences.getBoolean("premium_active_$userId", false)
+        return PremiumPolicy.favoritesLimitGb(userId, purchasedPremium)
+    }
+
     private companion object {
         const val PREFERENCES_NAME = "suyzissgram_local"
     }
