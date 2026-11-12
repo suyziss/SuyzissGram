@@ -11,6 +11,7 @@ import com.suyzissgram.domain.model.ChatAttachment
 import com.suyzissgram.domain.model.ChatMessage
 import com.suyzissgram.domain.model.ChatPreview
 import com.suyzissgram.domain.model.MediaQuality
+import com.suyzissgram.domain.model.PremiumPolicy
 import com.suyzissgram.domain.repository.ChatRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +32,8 @@ import java.util.UUID
 
 class FakeChatRepository(
     context: Context,
-    private val preferences: SharedPreferences
+    private val preferences: SharedPreferences,
+    private val favoriteLimitGb: () -> Int = { 5 }
 ) : ChatRepository {
     private val appContext = context.applicationContext
     private val mutex = Mutex()
@@ -78,6 +80,12 @@ class FakeChatRepository(
         }
 
         mutex.withLock {
+            val usedBytes = messages.value.sumOf { it.attachment?.sizeBytes ?: 0L }
+            val limitBytes = favoriteLimitGb().coerceAtLeast(1).toLong() * 1024L * 1024L * 1024L
+            if (usedBytes + attachment.sizeBytes > limitBytes) {
+                attachment.localPath?.let { path -> runCatching { File(path).delete() } }
+                throw IllegalStateException("FAVORITES_LIMIT_REACHED")
+            }
             val messageText = when (kind) {
                 AttachmentKind.IMAGE -> "Photo"
                 AttachmentKind.VIDEO -> "Video"
