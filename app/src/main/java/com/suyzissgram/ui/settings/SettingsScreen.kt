@@ -29,6 +29,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -43,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.suyzissgram.domain.model.AppLanguage
 import com.suyzissgram.domain.model.ThemeChoice
+import com.suyzissgram.domain.model.PremiumPolicy
 import com.suyzissgram.ui.i18n.AppStrings
 
 @Composable
@@ -54,12 +57,18 @@ fun SettingsScreen(
     onLanguage: (AppLanguage) -> Unit,
     onTheme: (ThemeChoice) -> Unit,
     onTextScale: (Float) -> Unit,
-    onClearMessages: () -> Unit
+    onClearMessages: () -> Unit,
+    userId: String,
+    onOnlyPremiumMessagesChange: (Boolean) -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     var languageExpanded by remember { mutableStateOf(false) }
     var themeExpanded by remember { mutableStateOf(false) }
     var showClearDialog by remember { mutableStateOf(false) }
+    var showPremiumDialog by remember { mutableStateOf(false) }
+    val isRussian = state.settings.language == AppLanguage.RU || state.settings.language == AppLanguage.KK
+    val premium = PremiumPolicy.isPremium(userId)
+    val favoritesLimit = PremiumPolicy.favoritesLimitGb(userId)
 
     val languageName = when (state.settings.language) {
         AppLanguage.EN -> "English"
@@ -71,6 +80,15 @@ fun SettingsScreen(
         ThemeChoice.LIGHT -> labels.light
         ThemeChoice.SYSTEM -> labels.system
         ThemeChoice.DARK -> labels.dark
+    }
+
+    if (showPremiumDialog) {
+        AlertDialog(
+            onDismissRequest = { showPremiumDialog = false },
+            title = { Text("SuyzissGram Premium") },
+            text = { Text(if (isRussian) "Цена будет на 34% ниже Telegram: 66% от соответствующей месячной или годовой цены. Точная сумма зависит от локальной цены Telegram. Покупка станет доступна после подключения сервера и проверки платежей." else "SuyzissGram Premium will cost 34% less than Telegram: 66% of the matching monthly or yearly price. Exact amounts depend on Telegram's local price. Purchases require a connected server and payment verification.") },
+            confirmButton = { TextButton(onClick = { showPremiumDialog = false }) { Text(labels.cancel) } }
+        )
     }
 
     if (showClearDialog) {
@@ -113,6 +131,61 @@ fun SettingsScreen(
                     if (state.settings.language == AppLanguage.RU) "Имя, фото и описание" else "Name, photo and bio",
                     onOpenProfile
                 )
+            }
+            item {
+                Column(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
+                        .background(colors.surface).padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("✦ SuyzissGram Premium", color = colors.primary, fontSize = 18.sp)
+                    Text(
+                        if (premium) {
+                            if (isRussian) "Premium активен для этого аккаунта" else "Premium is active for this account"
+                        } else {
+                            if (isRussian) "Дополнительные возможности профиля и увеличенное избранное" else "Profile customization and larger Saved storage"
+                        },
+                        color = colors.onSurface
+                    )
+                    Text(
+                        if (isRussian) "Избранное: ${favoritesLimit} ГБ${if (PremiumPolicy.isOwner(userId)) " · владелец" else ""}" else "Saved: ${favoritesLimit} GB",
+                        color = colors.onSurfaceVariant,
+                        fontSize = 13.sp
+                    )
+                    Text(
+                        if (isRussian) "Обычный: 5 ГБ · Premium: 30 ГБ · @suyziss: 100 ГБ" else "Free: 5 GB · Premium: 30 GB · @suyziss: 100 GB",
+                        color = colors.onSurfaceVariant,
+                        fontSize = 12.sp
+                    )
+                    Text(
+                        if (isRussian) "Месяц и год: на 34% дешевле Telegram (66% от его локальной цены)." else "Monthly and yearly: 34% less than Telegram (66% of its local price).",
+                        color = colors.onSurfaceVariant,
+                        fontSize = 12.sp
+                    )
+                    Button(onClick = { showPremiumDialog = true }, modifier = Modifier.fillMaxWidth()) {
+                        Text(if (isRussian) "Купить Premium" else "Get Premium")
+                    }
+                }
+            }
+            item {
+                Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
+                        .background(colors.surface).padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(if (isRussian) "Сообщения только от Premium" else "Premium users only", color = colors.onSurface)
+                        Text(
+                            if (isRussian) "Не затрагивает чаты, которые уже начаты" else "Does not affect conversations already started",
+                            color = colors.onSurfaceVariant,
+                            fontSize = 12.sp
+                        )
+                    }
+                    Switch(
+                        checked = state.settings.onlyPremiumMessages,
+                        onCheckedChange = onOnlyPremiumMessagesChange
+                    )
+                }
             }
             item { SectionTitle(labels.appearance) }
             item {
