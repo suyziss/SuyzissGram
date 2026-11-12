@@ -174,6 +174,9 @@ fun SuyzissNavHost(container: AppContainer) {
                     onBioChange = viewModel::onBioChanged,
                     onAvatarChange = viewModel::onAvatarChanged,
                     onAccentColorChange = viewModel::onAccentColorChanged,
+                    onNicknameColorChange = viewModel::onNicknameColorChanged,
+                    onProfileBackgroundColorChange = viewModel::onProfileBackgroundColorChanged,
+                    onProfileBackgroundImageChange = viewModel::onProfileBackgroundImageChanged,
                     onShareProfile = {
                         val profile = state.profile
                         val shareIntent = Intent(Intent.ACTION_SEND).apply {
