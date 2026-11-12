@@ -172,7 +172,7 @@ class LocalAuthRepository(
     private companion object {
         val EMAIL_PATTERN = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
         val USERNAME_PATTERN = Regex("^[A-Za-z][A-Za-z0-9_]{3,13}$")
-        val ACCOUNT_ID_PATTERN = Regex("^[0-9]{10,13}$")
+        val ACCOUNT_ID_PATTERN = Regex("^[0-9]{9,13}$")
         const val OWNER_USERNAME = "suyziss"
         const val OWNER_ACCOUNT_ID = "700200800"
         const val MIN_PASSWORD_LENGTH = 8
