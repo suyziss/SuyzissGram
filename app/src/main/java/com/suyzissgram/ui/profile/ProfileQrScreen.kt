@@ -131,6 +131,7 @@ fun ProfileQrScreen(
         if (!it) scanError = if (isRu) "Разрешите доступ к камере в настройках приложения." else "Allow camera access in app settings."
     }
     val cameraController = remember(context) { LifecycleCameraController(context) }
+    val scanHandled = remember { AtomicBoolean(false) }
     val scanner = remember {
         val options = BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
         BarcodeScanning.getClient(options)
@@ -163,7 +164,6 @@ fun ProfileQrScreen(
         }
     }
     val analysisExecutor = remember { Executors.newSingleThreadExecutor() }
-    val scanHandled = remember { AtomicBoolean(false) }
     val sweepTransition = rememberInfiniteTransition(label = "qr_scan_sweep")
     val sweepPosition by sweepTransition.animateFloat(0f, 1f, infiniteRepeatable(tween(1800, easing = LinearEasing), RepeatMode.Reverse), label = "qr_scan_line")
 
