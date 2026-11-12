@@ -46,6 +46,10 @@ class SettingsViewModel(
         repository.setChatTheme(value)
     }
 
+    fun setOnlyPremiumMessages(value: Boolean) = viewModelScope.launch {
+        repository.setOnlyPremiumMessages(value)
+    }
+
     fun clearMessages(onComplete: () -> Unit) = viewModelScope.launch {
         onComplete()
     }
