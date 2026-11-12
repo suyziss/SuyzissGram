@@ -5,6 +5,7 @@ import com.suyzissgram.data.repository.FakeChatRepository
 import com.suyzissgram.data.repository.FakeProfileRepository
 import com.suyzissgram.data.repository.FakeSettingsRepository
 import com.suyzissgram.data.repository.LocalAuthRepository
+import com.suyzissgram.domain.model.PremiumPolicy
 import com.suyzissgram.domain.repository.AuthRepository
 import com.suyzissgram.domain.repository.ChatRepository
 import com.suyzissgram.domain.repository.ProfileRepository
@@ -17,8 +18,13 @@ class AppContainer(context: Context) {
         Context.MODE_PRIVATE
     )
 
-    val authRepository: AuthRepository = LocalAuthRepository(preferences)
-    val chatRepository: ChatRepository = FakeChatRepository(appContext, preferences)
+    private val localAuthRepository = LocalAuthRepository(preferences)
+    val authRepository: AuthRepository = localAuthRepository
+    val chatRepository: ChatRepository = FakeChatRepository(appContext, preferences) {
+        val userId = localAuthRepository.currentSession()?.id.orEmpty()
+        val purchasedPremium = preferences.getBoolean("premium_active_$userId", false)
+        PremiumPolicy.favoritesLimitGb(userId, purchasedPremium)
+    }
     val settingsRepository: SettingsRepository = FakeSettingsRepository(preferences)
     val profileRepository: ProfileRepository = FakeProfileRepository(preferences)
 
