@@ -107,7 +107,7 @@ fun ProfileScreen(
 
     val backgroundBitmap by produceState<android.graphics.Bitmap?>(initialValue = null, backgroundUri) {
         value = if (backgroundUri == null) null else withContext(Dispatchers.IO) {
-            runCatching { context.contentResolver.openInputStream(backgroundUri)?.use(BitmapFactory::decodeStream) }.getOrNull()
+            runCatching { context.contentResolver.openInputStream(backgroundUri)?.use { input -> BitmapFactory.decodeStream(input) } }.getOrNull()
         }
     }
 
