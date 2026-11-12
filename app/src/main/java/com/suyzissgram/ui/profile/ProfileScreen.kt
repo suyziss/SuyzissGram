@@ -55,7 +55,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.suyzissgram.domain.model.AppLanguage
-import com.suyzissgram.domain.model.PremiumPolicy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -72,6 +71,7 @@ private val profileAccentColors = listOf(
 fun ProfileScreen(
     state: ProfileUiState,
     language: AppLanguage,
+    isPremium: Boolean,
     onBack: () -> Unit,
     onDisplayNameChange: (String) -> Unit,
     onUsernameChange: (String) -> Unit,
@@ -89,7 +89,6 @@ fun ProfileScreen(
     val context = LocalContext.current
     val avatarUri = state.profile.avatarUri?.let(Uri::parse)
     val backgroundUri = state.profile.profileBackgroundImageUri?.let(Uri::parse)
-    val isPremium = PremiumPolicy.isPremium(state.profile.id)
     val avatarScale by animateFloatAsState(if (state.isSaving) 0.84f else 1f, spring(stiffness = Spring.StiffnessLow), label = "profile_avatar_scale")
 
     val avatarBitmap by produceState<android.graphics.Bitmap?>(initialValue = null, avatarUri) {
