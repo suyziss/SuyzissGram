@@ -5,6 +5,9 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,6 +27,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -38,6 +43,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -69,11 +75,14 @@ fun ProfileScreen(
     onBioChange: (String) -> Unit,
     onAvatarChange: (String?) -> Unit,
     onAccentColorChange: (Long) -> Unit,
+    onShareProfile: () -> Unit,
+    onOpenQr: () -> Unit,
     onSave: () -> Unit
 ) {
     val isRussian = language == AppLanguage.RU
     val context = LocalContext.current
     val avatarUri = state.profile.avatarUri?.let(Uri::parse)
+    val avatarScale by animateFloatAsState(if (state.isSaving) 0.96f else 1f, spring(), label = "profile_avatar_scale")
 
     val avatarBitmap by produceState<android.graphics.Bitmap?>(initialValue = null, avatarUri) {
         value = if (avatarUri == null) {
@@ -123,12 +132,12 @@ fun ProfileScreen(
         }
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp).animateContentSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Box(
-                modifier = Modifier.size(112.dp).clip(CircleShape)
+                modifier = Modifier.size(112.dp).then(Modifier.graphicsLayer { scaleX = avatarScale; scaleY = avatarScale }).clip(CircleShape)
                     .background(Color(state.profile.accentColor.toInt()).copy(alpha = 0.20f)),
                 contentAlignment = Alignment.Center
             ) {
@@ -160,6 +169,26 @@ fun ProfileScreen(
                     TextButton(onClick = { onAvatarChange(null) }) {
                         Text(if (isRussian) "Удалить" else "Remove")
                     }
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Button(onClick = onShareProfile, modifier = Modifier.weight(1f), shape = RoundedCornerShape(14.dp)) {
+                    Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.size(7.dp))
+                    Text(if (isRussian) "Поделиться" else "Share")
+                }
+                androidx.compose.material3.OutlinedButton(
+                    onClick = onOpenQr,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Icon(Icons.Default.QrCode2, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.size(7.dp))
+                    Text(if (isRussian) "Мой QR" else "My QR")
                 }
             }
 
