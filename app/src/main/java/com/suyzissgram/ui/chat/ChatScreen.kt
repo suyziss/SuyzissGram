@@ -43,7 +43,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachFile
@@ -131,7 +130,6 @@ fun ChatScreen(
     onSendLocation: (Double, Double) -> Unit,
     chatTheme: Int,
     onChatThemeChange: (Int) -> Unit,
-    onOpenGifts: () -> Unit,
     onBack: () -> Unit,
     onOpenProfile: () -> Unit
 ) {
@@ -421,9 +419,6 @@ fun ChatScreen(
                 Text(labels.local, color = palette.muted, fontSize = 11.sp)
             }
             Spacer(Modifier.weight(1f))
-            IconButton(onClick = onOpenGifts) {
-                Icon(Icons.Default.CardGiftcard, contentDescription = if (isEnglish) "Gifts" else "Подарки", tint = palette.foreground)
-            }
             IconButton(onClick = { showPaletteDialog = true }) {
                 Icon(Icons.Default.Palette, contentDescription = if (isEnglish) "Chat appearance" else "Оформление чата", tint = palette.foreground)
             }
