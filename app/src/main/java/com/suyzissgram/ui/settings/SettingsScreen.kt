@@ -59,6 +59,8 @@ fun SettingsScreen(
     onTextScale: (Float) -> Unit,
     onClearMessages: () -> Unit,
     userId: String,
+    isPremium: Boolean,
+    favoritesLimitGb: Int,
     onOnlyPremiumMessagesChange: (Boolean) -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
@@ -67,8 +69,8 @@ fun SettingsScreen(
     var showClearDialog by remember { mutableStateOf(false) }
     var showPremiumDialog by remember { mutableStateOf(false) }
     val isRussian = state.settings.language == AppLanguage.RU || state.settings.language == AppLanguage.KK
-    val premium = PremiumPolicy.isPremium(userId)
-    val favoritesLimit = PremiumPolicy.favoritesLimitGb(userId)
+    val premium = isPremium
+    val favoritesLimit = favoritesLimitGb
 
     val languageName = when (state.settings.language) {
         AppLanguage.EN -> "English"
