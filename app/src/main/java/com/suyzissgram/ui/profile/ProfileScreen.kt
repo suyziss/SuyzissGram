@@ -7,6 +7,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -89,7 +90,7 @@ fun ProfileScreen(
     val avatarUri = state.profile.avatarUri?.let(Uri::parse)
     val backgroundUri = state.profile.profileBackgroundImageUri?.let(Uri::parse)
     val isPremium = PremiumPolicy.isPremium(state.profile.id)
-    val avatarScale by animateFloatAsState(if (state.isSaving) 0.96f else 1f, spring(), label = "profile_avatar_scale")
+    val avatarScale by animateFloatAsState(if (state.isSaving) 0.84f else 1f, spring(stiffness = Spring.StiffnessLow), label = "profile_avatar_scale")
 
     val avatarBitmap by produceState<android.graphics.Bitmap?>(initialValue = null, avatarUri) {
         value = if (avatarUri == null) {
